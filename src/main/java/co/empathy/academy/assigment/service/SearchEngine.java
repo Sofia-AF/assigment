@@ -6,6 +6,4 @@ public interface SearchEngine {
 
     int search(String query);
     SimpleResponse searchQuery(String query);
-    String getQueryValue(String query);
-    String getElasticVersion();
 }

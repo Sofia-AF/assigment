@@ -42,12 +42,8 @@ public class SearchEngineImpl implements SearchEngine {
             numberVersion = version.getString("number");
         } catch (IOException e) {
             throw new RuntimeException(e);
-        };
+        }
         return numberVersion;
-    }
-
-    public String getQueryValue(String query){
-        return query;
     }
 
 
