@@ -1,0 +1,1 @@
+Proposed weekly assignments for the Academy Search batch.
