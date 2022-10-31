@@ -2,6 +2,8 @@ package co.empathy.academy.assigment.service;
 
 import co.empathy.academy.assigment.model.SimpleResponse;
 
+import java.io.IOException;
+
 // This is the service class that will implement your search service logic
 // It has a SearchEngine as a dependency
 // Endpoint: /search (controller) -> SearchService -> SearchEngine
@@ -19,7 +21,7 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public SimpleResponse searchQuery(String query) {
+    public SimpleResponse searchQuery(String query) throws IOException {
         return searchEngine.searchQuery(query);
     }
 

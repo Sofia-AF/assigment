@@ -3,6 +3,8 @@ package co.empathy.academy.assigment.service;
 import co.empathy.academy.assigment.model.SimpleResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.IOException;
+
 public class SearchEngineImpl implements SearchEngine {
 
     // This method should make a request to Elasticsearch to retrieve search results
@@ -19,7 +21,7 @@ public class SearchEngineImpl implements SearchEngine {
     }
 
     @Override
-    public SimpleResponse searchQuery(String query) {
+    public SimpleResponse searchQuery(String query) throws IOException {
         String numberVersion = elasticClient.getElasticVersion();
         return new SimpleResponse(query, numberVersion);
     }
