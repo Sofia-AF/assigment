@@ -7,12 +7,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+
 @RestController
 public class SearchController {
     @Autowired
     private SearchService searchService;
     @GetMapping("/search")
-    public SimpleResponse searchQuery(@RequestParam(value="query") String query) {
+    public SimpleResponse searchQuery(@RequestParam(value="query") String query) throws IOException {
         return searchService.searchQuery(query);
     }
 }
