@@ -4,7 +4,9 @@ import lombok.Value;
 
 @Value
 public class SimpleResponse {
-    private String query;
-    private String version;
+    // Stores int value of the request made
+    private int statusCode;
+    // Stores String value with the contents wanted to show for each request
+    private String bodyMessage;
 
 }

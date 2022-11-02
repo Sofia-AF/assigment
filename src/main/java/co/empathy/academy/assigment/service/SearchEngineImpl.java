@@ -1,6 +1,6 @@
 package co.empathy.academy.assigment.service;
 
-import co.empathy.academy.assigment.model.SimpleResponse;
+import co.empathy.academy.assigment.model.SearchResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
@@ -21,8 +21,8 @@ public class SearchEngineImpl implements SearchEngine {
     }
 
     @Override
-    public SimpleResponse searchQuery(String query) throws IOException {
+    public SearchResponse searchQuery(String query) throws IOException {
         String numberVersion = elasticClient.getElasticVersion();
-        return new SimpleResponse(query, numberVersion);
+        return new SearchResponse(query, numberVersion);
     }
 }

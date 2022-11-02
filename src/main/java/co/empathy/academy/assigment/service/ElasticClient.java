@@ -1,6 +1,7 @@
 package co.empathy.academy.assigment.service;
 
 import co.empathy.academy.assigment.model.Movie;
+import co.empathy.academy.assigment.model.SimpleResponse;
 
 import java.io.IOException;
 
@@ -14,26 +15,25 @@ public interface ElasticClient {
 
     /**
      * Shows all indexes created
-     * @return : String with all indexes found
-     * @throws IOException : when can't perform GET request to ElasticSearch
+     * @return SimpleResponse
      */
-    String showAllIndexes() throws IOException;
+    SimpleResponse showAllIndexes();
 
     /**
      * Creates a new index on <indexName>, with its settings and mappings stored in <body>
      * @param indexName : name to index to create
      * @param body : retrieved String with the settings and
-     * @throws IOException : when can't perform index creation request to ElasticSearch
+     * @return SimpleResponse
      */
-    void createIndex(String indexName, String body) throws IOException;
+    SimpleResponse createIndex(String indexName, String body);
 
     /**
      * Indexes a new document in a index. If the target index does not exist, creates new one
      * @param indexName : index target to index the new document
      * @param docId : document identifier (optional)
      * @param movie : request body with info of the movie to index
-     * @throws IOException : when can't perform indexing request to ElasticSearch
+     * @return SimpleResponse
      */
-    void indexDocument(String indexName, String docId, Movie movie) throws IOException;
+    SimpleResponse indexDocument(String indexName, String docId, Movie movie);
 
 }

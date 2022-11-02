@@ -3,6 +3,7 @@ package co.empathy.academy.assigment.service;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.indices.CreateIndexRequest;
 import co.empathy.academy.assigment.model.Movie;
+import co.empathy.academy.assigment.model.SimpleResponse;
 import org.apache.http.util.EntityUtils;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
@@ -14,7 +15,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Random;
 
 public class ElasticClientImpl implements ElasticClient{
     @Autowired
@@ -45,27 +45,35 @@ public class ElasticClientImpl implements ElasticClient{
 
     /**
      * Shows all indexes created
-     * @return : String with all indexes found
-     * @throws IOException : when can't perform GET request to ElasticSearch
+     * @return : SimpleResponse where bodyMessage is a string with all the indexes found
      */
     @Override
-    public String showAllIndexes() throws IOException {
+    public SimpleResponse showAllIndexes() {
         String responseBody, endPoint = "/_cat/indices/";
-        // Creates GET request to endPoint
-        Response response = client.performRequest(new Request("GET", endPoint));
-        responseBody = EntityUtils.toString(response.getEntity());
-
-        return responseBody;
+        try {
+            // Creates GET request to endPoint
+            Response response = client.performRequest(new Request("GET", endPoint));
+            responseBody = EntityUtils.toString(response.getEntity());
+        } catch (IOException e) {
+            return new SimpleResponse(500, "ERROR: can't connect to server.");
+        }
+        return new SimpleResponse(200, responseBody);
     }
 
     /**
      * Creates a new index on <indexName>, with its settings and mappings stored in <body>
      * @param indexName : name to index to create
-     * @param body : retrieved String with the settings and
-     * @throws IOException : when can't perform index creation request to ElasticSearch
+     * @param body      : retrieved String with the settings and
+     * @return SimpleResponse
      */
     @Override
-    public void createIndex(String indexName, String body) throws IOException {
+    public SimpleResponse createIndex(String indexName, String body) {
+        // First checks parameters
+        if(indexName == null)
+            return new SimpleResponse(400, "ERROR: missing required parameter <indexName>");
+        else if (body == null)
+            return new SimpleResponse(400, "ERROR: missing JSON body in PUT request.");
+
         // Opens input stream for the string body
         InputStream inputBody = new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8));
 
@@ -73,9 +81,16 @@ public class ElasticClientImpl implements ElasticClient{
         CreateIndexRequest request = CreateIndexRequest.of(b -> b
                 .index(indexName).withJson(inputBody));
         // Creates the index, and checks it's been created correctly
-        elastic.indices().create(request).acknowledged();
-
-
+        try {
+            if(elastic.indices().create(request).acknowledged())
+                return new SimpleResponse(200, " * Index '"+indexName+"' created correctly.");
+        } catch (IOException e) {
+            return new SimpleResponse(500, "ERROR: can't connect to server.");
+        } catch (Exception e){
+            return new SimpleResponse(400, "ERROR: index with <indexName> = '"+indexName+"', already exists.");
+        }
+        // Can't create index for unhandled reasons
+        return new SimpleResponse(403, "ERROR: can't index '"+indexName+"'.");
     }
 
     /**
@@ -83,15 +98,31 @@ public class ElasticClientImpl implements ElasticClient{
      * @param indexName : index target to index the new document
      * @param docId : document identifier (optional)
      * @param movie : request body with info of the movie to index
-     * @throws IOException : when can't perform indexing request to ElasticSearch
+     * @return SimpleResponse
      */
     @Override
-    public void indexDocument(String indexName, String docId, Movie movie) throws IOException {
-        // If no movieId is given, generates random id, range [100-500]
-        String newId = ((docId == null) ? String.valueOf(new Random().nextInt(400) + 100) : docId);
+    public SimpleResponse indexDocument(String indexName, String docId, Movie movie) {
+        // First checks parameters
+        if(indexName == null)
+            return new SimpleResponse(400, "ERROR: missing required parameter <indexName>");
+        else if (movie == null)
+            return new SimpleResponse(400, "ERROR: missing JSON body in request.");
 
-        // IndexResponse response =
-        elastic.index(i -> i.index(indexName).id(newId).document(movie));
-        //System.out.println("Indexed movie with version" + response.version());
+        try {
+            // Checks type of request
+            if(docId == null)
+                // Post request
+                elastic.index(i -> i.index(indexName).document(movie));
+            else
+                // Put request
+                elastic.index(i -> i.index(indexName).id(docId).document(movie));
+            return new SimpleResponse(200, "* Movie '" + movie.getTitle() + "', indexed correctly in '" + indexName + "'.");
+        } catch (IOException e) {
+            return new SimpleResponse(500, "ERROR: can't connect to server.");
+        } catch (Exception e){
+            // Can't index document for unhandled reasons
+            return new SimpleResponse(403, "ERROR: can't index document in index '"+indexName+"'.");
+        }
+
     }
 }

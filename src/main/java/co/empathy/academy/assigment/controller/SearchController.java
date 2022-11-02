@@ -1,6 +1,6 @@
 package co.empathy.academy.assigment.controller;
 
-import co.empathy.academy.assigment.model.SimpleResponse;
+import co.empathy.academy.assigment.model.SearchResponse;
 import co.empathy.academy.assigment.service.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,7 +14,7 @@ public class SearchController {
     @Autowired
     private SearchService searchService;
     @GetMapping("/search")
-    public SimpleResponse searchQuery(@RequestParam(value="query") String query) throws IOException {
+    public SearchResponse searchQuery(@RequestParam(value="query") String query) throws IOException {
         return searchService.searchQuery(query);
     }
 }

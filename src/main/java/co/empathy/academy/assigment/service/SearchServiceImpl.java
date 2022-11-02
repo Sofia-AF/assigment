@@ -1,6 +1,6 @@
 package co.empathy.academy.assigment.service;
 
-import co.empathy.academy.assigment.model.SimpleResponse;
+import co.empathy.academy.assigment.model.SearchResponse;
 
 import java.io.IOException;
 
@@ -21,7 +21,7 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public SimpleResponse searchQuery(String query) throws IOException {
+    public SearchResponse searchQuery(String query) throws IOException {
         return searchEngine.searchQuery(query);
     }
 
