@@ -1,12 +1,12 @@
 package co.empathy.academy.assigment.service;
 
-import co.empathy.academy.assigment.model.SimpleResponse;
+import co.empathy.academy.assigment.model.SearchResponse;
 
 import java.io.IOException;
 
 public interface SearchService {
 
     int search(String query);
-    SimpleResponse searchQuery(String query) throws IOException;
+    SearchResponse searchQuery(String query) throws IOException;
 
 }

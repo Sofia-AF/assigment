@@ -1,6 +1,6 @@
 package co.empathy.academy.assigment.service;
 
-import co.empathy.academy.assigment.model.SimpleResponse;
+import co.empathy.academy.assigment.model.SearchResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -20,11 +20,11 @@ public class SearchServiceImplTest {
         String query = "shirt";
         String version = "7.17.2";
         SearchEngine searchEngine = mock(SearchEngine.class);
-        SimpleResponse expectedResponse = new SimpleResponse(query, version);
+        SearchResponse expectedResponse = new SearchResponse(query, version);
         try {
             given(searchEngine.searchQuery(query)).willReturn(expectedResponse);
             SearchService searchService = new SearchServiceImpl(searchEngine);
-            SimpleResponse givenResponse = searchService.searchQuery(query);
+            SearchResponse givenResponse = searchService.searchQuery(query);
             assertEquals(expectedResponse, givenResponse);
         } catch (IOException e) {
             throw new RuntimeException(e);
