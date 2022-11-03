@@ -18,134 +18,115 @@ import static org.mockito.Mockito.mock;
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
 public class ElasticEngineTesting {
+    private final ElasticEngine ee = mock(ElasticEngineImpl.class);
+    private final int EXPECTED_SUCCESS_CODE = 200;
+    private final int EXPECTED_ERROR_CODE = 400;
+    private final String TEST_INDEX_NAME = "test_index";
+    private final Movie movie = new Movie("Cars", 2006, "animation", "someone");
+
 
     @Test
     void givenValidRequest_whenShowAllResults_thenReturnOk(){
-        ElasticEngine ee = mock(ElasticEngineImpl.class);
-        int expectedCode = 200;
         String expectedBody = "green  open .geoip_databases _zvzsizZQ9iChtYCVp5vjw 1 0 40 40 38.3mb 38.3mb";
-        SimpleResponse expected = new SimpleResponse(expectedCode, expectedBody);
+        SimpleResponse expected = new SimpleResponse(EXPECTED_SUCCESS_CODE, expectedBody);
         given(ee.showAllIndexes()).willReturn(expected);
         ElasticService es = new ElasticServiceImpl(ee);
         SimpleResponse given = es.showAllIndexes();
         assertEquals(given.getBodyMessage(), expectedBody);
-        assertEquals(given.getStatusCode(), expectedCode);
+        assertEquals(given.getStatusCode(), EXPECTED_SUCCESS_CODE);
     }
 
     @Test
     void givenCorrectIndexParameters_whenCreateIndex_thenReturnOk(){
-        ElasticEngine ee = mock(ElasticEngineImpl.class);
-        int expectedCode = 200;
         String expectedBody = "* Index 'index_test' created correctly.";
-        String indexName = "index_test";
-        SimpleResponse expected = new SimpleResponse(expectedCode, expectedBody);
-        given(ee.createIndex(indexName,"")).willReturn(expected);
+        SimpleResponse expected = new SimpleResponse(EXPECTED_SUCCESS_CODE, expectedBody);
+        given(ee.createIndex(TEST_INDEX_NAME,"")).willReturn(expected);
         ElasticService es = new ElasticServiceImpl(ee);
-        SimpleResponse given = es.createIndex(indexName, "");
+        SimpleResponse given = es.createIndex(TEST_INDEX_NAME, "");
         assertEquals(given.getBodyMessage(), expectedBody);
-        assertEquals(given.getStatusCode(), expectedCode);
+        assertEquals(given.getStatusCode(), EXPECTED_SUCCESS_CODE);
     }
 
     @Test
     void givenBadIndexParameter_whenCreateIndex_thenReturnError400(){
-        ElasticEngine ee = mock(ElasticEngineImpl.class);
-        int expectedCode = 400;
         String expectedBody = "ERROR: missing required parameter <indexName>";
-        SimpleResponse expected = new SimpleResponse(expectedCode, expectedBody);
+        SimpleResponse expected = new SimpleResponse(EXPECTED_ERROR_CODE, expectedBody);
         given(ee.createIndex(null,"")).willReturn(expected);
         ElasticService es = new ElasticServiceImpl(ee);
         SimpleResponse given = es.createIndex(null, "");
         assertEquals(given.getBodyMessage(), expectedBody);
-        assertEquals(given.getStatusCode(), expectedCode);
+        assertEquals(given.getStatusCode(), EXPECTED_ERROR_CODE);
     }
 
     @Test
     void givenBadBodyParameter_whenCreateIndex_thenReturnError400(){
-        ElasticEngine ee = mock(ElasticEngineImpl.class);
-        int expectedCode = 400;
         String expectedBody = "ERROR: missing JSON body in PUT request.";
-        SimpleResponse expected = new SimpleResponse(expectedCode, expectedBody);
-        given(ee.createIndex("index_name",null)).willReturn(expected);
+        SimpleResponse expected = new SimpleResponse(EXPECTED_ERROR_CODE, expectedBody);
+        given(ee.createIndex(TEST_INDEX_NAME,null)).willReturn(expected);
         ElasticService es = new ElasticServiceImpl(ee);
-        SimpleResponse given = es.createIndex("index_name", null);
+        SimpleResponse given = es.createIndex(TEST_INDEX_NAME, null);
         assertEquals(given.getBodyMessage(), expectedBody);
-        assertEquals(given.getStatusCode(), expectedCode);
+        assertEquals(given.getStatusCode(), EXPECTED_ERROR_CODE);
     }
 
     @Test
     void givenSameIndexDuplicate_whenCreateIndex_thenReturnError(){
         // First create the new index
-        ElasticEngine ee = mock(ElasticEngineImpl.class);
-        int expectedCode = 200;
         String expectedBody = "* Index 'index_test' created correctly.";
-        String indexName = "index_test";
-        SimpleResponse expected = new SimpleResponse(expectedCode, expectedBody);
-        given(ee.createIndex(indexName,"")).willReturn(expected);
+        SimpleResponse expected = new SimpleResponse(EXPECTED_SUCCESS_CODE, expectedBody);
+        given(ee.createIndex(TEST_INDEX_NAME,"")).willReturn(expected);
         ElasticService es = new ElasticServiceImpl(ee);
-        SimpleResponse given = es.createIndex(indexName, "");
+        SimpleResponse given = es.createIndex(TEST_INDEX_NAME, "");
 
         // Then index the same index
         SimpleResponse expectedDuplicate = new SimpleResponse(400, "ERROR: index with <indexName> = 'index_name', already exists.");
-        given(ee.createIndex(indexName,"")).willReturn(expectedDuplicate);
-        SimpleResponse duplicate = es.createIndex(indexName, "");
+        given(ee.createIndex(TEST_INDEX_NAME,"")).willReturn(expectedDuplicate);
+        SimpleResponse duplicate = es.createIndex(TEST_INDEX_NAME, "");
         assertEquals(expectedDuplicate, duplicate);
     }
 
     @Test
     void givenBadIndexParameter_whenIndexDocument_thenReturnError400(){
-        ElasticEngine ee = mock(ElasticEngineImpl.class);
-        Movie movie = new Movie("Cars", 2006, "animation", "someone");
-        int expectedCode = 400;
         String expectedBody = "ERROR: missing required parameter <indexName>";
-        SimpleResponse expected = new SimpleResponse(expectedCode, expectedBody);
+        SimpleResponse expected = new SimpleResponse(EXPECTED_ERROR_CODE, expectedBody);
         given(ee.indexDocument(null,"2", movie)).willReturn(expected);
         ElasticService es = new ElasticServiceImpl(ee);
         SimpleResponse given = es.indexDocument(null, "2", movie);
         assertEquals(given.getBodyMessage(), expectedBody);
-        assertEquals(given.getStatusCode(), expectedCode);
+        assertEquals(given.getStatusCode(), EXPECTED_ERROR_CODE);
     }
 
     @Test
     void givenBadMovieParameter_whenIndexDocument_thenReturnError400(){
-        ElasticEngine ee = mock(ElasticEngineImpl.class);
-        int expectedCode = 400;
         String expectedBody = "ERROR: missing required parameter <indexName>";
-        SimpleResponse expected = new SimpleResponse(expectedCode, expectedBody);
-        given(ee.indexDocument("name","2", null)).willReturn(expected);
+        SimpleResponse expected = new SimpleResponse(EXPECTED_ERROR_CODE, expectedBody);
+        given(ee.indexDocument(TEST_INDEX_NAME,"2", null)).willReturn(expected);
         ElasticService es = new ElasticServiceImpl(ee);
-        SimpleResponse given = es.indexDocument("name", "2", null);
+        SimpleResponse given = es.indexDocument(TEST_INDEX_NAME, "2", null);
         assertEquals(given.getBodyMessage(), expectedBody);
-        assertEquals(given.getStatusCode(), expectedCode);
+        assertEquals(given.getStatusCode(), EXPECTED_ERROR_CODE);
     }
 
     @Test
     void givenValidParameters_whenIndexDocumentWithPostRequest_thenReturnOk(){
-        ElasticEngine ee = mock(ElasticEngineImpl.class);
-        Movie movie = new Movie("Cars", 2006, "animation", "someone");
-        int expectedCode = 400;
-        String indexName = "name";
-        String expectedBody = "* Movie '" + movie.getTitle() + "', indexed correctly in '" + indexName + "'.";
-        SimpleResponse expected = new SimpleResponse(expectedCode, expectedBody);
-        given(ee.indexDocument("name",null, movie)).willReturn(expected);
+        String expectedBody = "* Movie '" + movie.getTitle() + "', indexed correctly in '" + TEST_INDEX_NAME + "'.";
+        SimpleResponse expected = new SimpleResponse(EXPECTED_SUCCESS_CODE, expectedBody);
+        given(ee.indexDocument(TEST_INDEX_NAME,null, movie)).willReturn(expected);
         ElasticService es = new ElasticServiceImpl(ee);
-        SimpleResponse given = es.indexDocument("name", null, movie);
+        SimpleResponse given = es.indexDocument(TEST_INDEX_NAME, null, movie);
         assertEquals(given.getBodyMessage(), expectedBody);
-        assertEquals(given.getStatusCode(), expectedCode);
+        assertEquals(given.getStatusCode(), EXPECTED_SUCCESS_CODE);
     }
 
     @Test
     void givenValidParameters_whenIndexDocumentWithPutRequest_thenReturnOk(){
-        ElasticEngine ee = mock(ElasticEngineImpl.class);
-        Movie movie = new Movie("Cars", 2006, "animation", "someone");
-        int expectedCode = 400;
         String id = "t97832451";
-        String indexName = "name";
-        String expectedBody = "* Movie '" + movie.getTitle() + "', indexed correctly in '" + indexName + "'.";
-        SimpleResponse expected = new SimpleResponse(expectedCode, expectedBody);
-        given(ee.indexDocument("name",id, movie)).willReturn(expected);
+        String expectedBody = "* Movie '" + movie.getTitle() + "', indexed correctly in '" + TEST_INDEX_NAME + "'.";
+        SimpleResponse expected = new SimpleResponse(EXPECTED_SUCCESS_CODE, expectedBody);
+        given(ee.indexDocument(TEST_INDEX_NAME,id, movie)).willReturn(expected);
         ElasticService es = new ElasticServiceImpl(ee);
-        SimpleResponse given = es.indexDocument("name", id, movie);
+        SimpleResponse given = es.indexDocument(TEST_INDEX_NAME, id, movie);
         assertEquals(given.getBodyMessage(), expectedBody);
-        assertEquals(given.getStatusCode(), expectedCode);
+        assertEquals(given.getStatusCode(), EXPECTED_SUCCESS_CODE);
     }
 }
