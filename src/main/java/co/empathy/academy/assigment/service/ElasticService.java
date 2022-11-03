@@ -5,7 +5,7 @@ import co.empathy.academy.assigment.model.SimpleResponse;
 
 import java.io.IOException;
 
-public interface ElasticClient {
+public interface ElasticService {
     /**
      * Returns the current ElasticSearch version as a String
      * @return : String with current ES version
