@@ -10,7 +10,7 @@ public class SearchEngineImpl implements SearchEngine {
     // This method should make a request to Elasticsearch to retrieve search results
     // For our example we'll just return the query length as number of results
     @Autowired
-    public ElasticClient elasticClient;
+    public ElasticEngine elasticEngine;
 
     @Override
     public int search(String query) {
@@ -22,7 +22,7 @@ public class SearchEngineImpl implements SearchEngine {
 
     @Override
     public SearchResponse searchQuery(String query) throws IOException {
-        String numberVersion = elasticClient.getElasticVersion();
+        String numberVersion = elasticEngine.getElasticVersion();
         return new SearchResponse(query, numberVersion);
     }
 }

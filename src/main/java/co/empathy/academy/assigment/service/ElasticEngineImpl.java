@@ -4,6 +4,7 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.indices.CreateIndexRequest;
 import co.empathy.academy.assigment.model.Movie;
 import co.empathy.academy.assigment.model.SimpleResponse;
+import io.micrometer.core.instrument.util.IOUtils;
 import org.apache.http.util.EntityUtils;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
@@ -16,7 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
-public class ElasticClientImpl implements ElasticClient{
+public class ElasticEngineImpl implements ElasticEngine {
     @Autowired
     private ElasticsearchClient elastic;
 
@@ -80,8 +81,9 @@ public class ElasticClientImpl implements ElasticClient{
         // Fills index request with the contents for the new indexName
         CreateIndexRequest request = CreateIndexRequest.of(b -> b
                 .index(indexName).withJson(inputBody));
-        // Creates the index, and checks it's been created correctly
+
         try {
+            // Creates the index, and checks it's been created correctly
             if(elastic.indices().create(request).acknowledged())
                 return new SimpleResponse(200, " * Index '"+indexName+"' created correctly.");
         } catch (IOException e) {

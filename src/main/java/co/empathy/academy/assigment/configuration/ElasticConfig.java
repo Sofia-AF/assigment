@@ -4,8 +4,10 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
-import co.empathy.academy.assigment.service.ElasticClient;
-import co.empathy.academy.assigment.service.ElasticClientImpl;
+import co.empathy.academy.assigment.service.ElasticEngine;
+import co.empathy.academy.assigment.service.ElasticEngineImpl;
+import co.empathy.academy.assigment.service.ElasticService;
+import co.empathy.academy.assigment.service.ElasticServiceImpl;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
 import org.springframework.context.annotation.Bean;
@@ -13,10 +15,14 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class ElasticConfig {
+    @Bean
+    public ElasticEngine elasticEngine() {
+        return new ElasticEngineImpl();
+    }
 
     @Bean
-    public ElasticClient elasticClient() {
-        return new ElasticClientImpl();
+    public ElasticService elasticService(ElasticEngine elasticEngine){
+        return new ElasticServiceImpl(elasticEngine);
     }
 
     @Bean

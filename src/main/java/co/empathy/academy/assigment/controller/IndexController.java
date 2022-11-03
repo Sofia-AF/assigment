@@ -2,17 +2,15 @@ package co.empathy.academy.assigment.controller;
 
 import co.empathy.academy.assigment.model.Movie;
 import co.empathy.academy.assigment.model.SimpleResponse;
-import co.empathy.academy.assigment.service.ElasticClient;
+import co.empathy.academy.assigment.service.ElasticService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-
 @RestController
 public class IndexController {
     @Autowired
-    private ElasticClient elasticClient;
+    private ElasticService elastic;
 
     /**
      * GET request that returns all created indexes
@@ -21,7 +19,7 @@ public class IndexController {
      */
     @GetMapping("/index")
     public ResponseEntity showAllIndexes() {
-        SimpleResponse sr = elasticClient.showAllIndexes();
+        SimpleResponse sr = elastic.showAllIndexes();
         return ResponseEntity.status(sr.getStatusCode()).body(sr.getBodyMessage());
     }
 
@@ -34,7 +32,7 @@ public class IndexController {
      */
     @PutMapping("/{indexName}")
     public ResponseEntity addIndex(@PathVariable String indexName, @RequestBody String body) {
-        SimpleResponse sr = elasticClient.createIndex(indexName, body);
+        SimpleResponse sr = elastic.createIndex(indexName, body);
         return ResponseEntity.status(sr.getStatusCode()).body(sr.getBodyMessage());
     }
 
@@ -47,7 +45,7 @@ public class IndexController {
      */
     @PostMapping("/{indexName}/_doc")
     public ResponseEntity indexDocument(@PathVariable String indexName, @RequestBody Movie movie) {
-        SimpleResponse sr = elasticClient.indexDocument(indexName, null, movie);
+        SimpleResponse sr = elastic.indexDocument(indexName, null, movie);
         return ResponseEntity.status(sr.getStatusCode()).body(sr.getBodyMessage());
     }
 
@@ -62,7 +60,7 @@ public class IndexController {
     @PutMapping("/{indexName}/_doc/{movieId}")
     public ResponseEntity indexDocument(@PathVariable String indexName, @PathVariable String movieId,
                                                       @RequestBody Movie movie) {
-        SimpleResponse sr = elasticClient.indexDocument(indexName, movieId, movie);
+        SimpleResponse sr = elastic.indexDocument(indexName, movieId, movie);
         return ResponseEntity.status(sr.getStatusCode()).body(sr.getBodyMessage());
     }
 }
