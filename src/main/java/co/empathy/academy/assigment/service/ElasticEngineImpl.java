@@ -143,6 +143,12 @@ public class ElasticEngineImpl implements ElasticEngine {
 
     }
 
+    /**
+     * Makes a query to a specific index
+     * @param indexName : index where the search is going to take place
+     * @param body : settings of the query
+     * @return : SimpleResponse
+     */
     @Override
     public SimpleResponse searchIndex(String indexName, String body){
         // First checks parameters
@@ -188,6 +194,12 @@ public class ElasticEngineImpl implements ElasticEngine {
          */
     }
 
+    /**
+     * Makes a multi-match query
+     * @param indexName : index where the search is going to take place
+     * @param typeJSON : params of the query
+     * @return SimpleResponse
+     */
     private SimpleResponse makeMultiMatchQuery(String indexName, JSONObject typeJSON) {
         String query = typeJSON.getString("query");
         List<String> fields = new ArrayList<>();
@@ -208,11 +220,23 @@ public class ElasticEngineImpl implements ElasticEngine {
         }
     }
 
+    /**
+     * Makes a term query
+     * @param indexName : index where the search is going to take place
+     * @param keys : params of the query
+     * @return SimpleResponse
+     */
     public SimpleResponse makeTermQuery(String indexName, Iterator<String> keys){
         System.out.println("Term");
         return null;
     }
 
+    /**
+     * Makes a termsquery
+     * @param indexName : index where the search is going to take place
+     * @param keys : params of the query
+     * @return SimpleResponse
+     */
     public SimpleResponse makeTermsQuery(String indexName, Iterator<String> keys){
         System.out.println("Terms");
         return null;
