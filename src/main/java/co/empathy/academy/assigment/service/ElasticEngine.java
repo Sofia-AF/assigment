@@ -2,6 +2,7 @@ package co.empathy.academy.assigment.service;
 
 import co.empathy.academy.assigment.model.Movie;
 import co.empathy.academy.assigment.model.SimpleResponse;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
@@ -36,4 +37,7 @@ public interface ElasticEngine {
      */
     SimpleResponse indexDocument(String indexName, String docId, Movie movie);
 
+    SimpleResponse searchIndex(String indexName, String body);
+
+    SimpleResponse bulkIndex(MultipartFile multipartFile);
 }

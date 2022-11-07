@@ -22,7 +22,7 @@ public class ElasticEngineTesting {
     private final int EXPECTED_SUCCESS_CODE = 200;
     private final int EXPECTED_ERROR_CODE = 400;
     private final String TEST_INDEX_NAME = "test_index";
-    private final Movie movie = new Movie("Cars", 2006, "animation", "someone");
+    private final Movie movie = new Movie("id1","Movie", "Cars", "Cars", false, 2006, 0, 120, "animation");
 
 
     @Test
@@ -109,7 +109,7 @@ public class ElasticEngineTesting {
 
     @Test
     void givenValidParameters_whenIndexDocumentWithPostRequest_thenReturnOk(){
-        String expectedBody = "* Movie '" + movie.getTitle() + "', indexed correctly in '" + TEST_INDEX_NAME + "'.";
+        String expectedBody = "* Movie '" + movie.getOriginalTitle() + "', indexed correctly in '" + TEST_INDEX_NAME + "'.";
         SimpleResponse expected = new SimpleResponse(EXPECTED_SUCCESS_CODE, expectedBody);
         given(ee.indexDocument(TEST_INDEX_NAME,null, movie)).willReturn(expected);
         ElasticService es = new ElasticServiceImpl(ee);
@@ -121,7 +121,7 @@ public class ElasticEngineTesting {
     @Test
     void givenValidParameters_whenIndexDocumentWithPutRequest_thenReturnOk(){
         String id = "t97832451";
-        String expectedBody = "* Movie '" + movie.getTitle() + "', indexed correctly in '" + TEST_INDEX_NAME + "'.";
+        String expectedBody = "* Movie '" + movie.getOriginalTitle() + "', indexed correctly in '" + TEST_INDEX_NAME + "'.";
         SimpleResponse expected = new SimpleResponse(EXPECTED_SUCCESS_CODE, expectedBody);
         given(ee.indexDocument(TEST_INDEX_NAME,id, movie)).willReturn(expected);
         ElasticService es = new ElasticServiceImpl(ee);

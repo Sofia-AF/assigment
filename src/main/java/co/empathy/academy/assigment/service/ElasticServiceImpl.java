@@ -2,6 +2,7 @@ package co.empathy.academy.assigment.service;
 
 import co.empathy.academy.assigment.model.Movie;
 import co.empathy.academy.assigment.model.SimpleResponse;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
@@ -31,5 +32,15 @@ public class ElasticServiceImpl implements ElasticService{
     @Override
     public SimpleResponse indexDocument(String indexName, String docId, Movie movie) {
         return elasticEngine.indexDocument(indexName, docId, movie);
+    }
+
+    @Override
+    public SimpleResponse searchIndex(String indexName, String body) {
+        return elasticEngine.searchIndex(indexName, body);
+    }
+
+    @Override
+    public SimpleResponse bulkIndex(MultipartFile multipartFile) {
+       return elasticEngine.bulkIndex(multipartFile);
     }
 }

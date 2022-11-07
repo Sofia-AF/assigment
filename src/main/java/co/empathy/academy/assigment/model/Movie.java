@@ -1,10 +1,21 @@
 package co.empathy.academy.assigment.model;
-import lombok.Value;
+import lombok.*;
 
-@Value
+import java.util.List;
+
+@Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Movie {
-    private String title;
-    private int year;
-    private String genre;
-    private String director;
+    private String tconst;
+    private String titleType;
+    private String primaryTitle;
+    private String originalTitle;
+    private Boolean isAdult;
+    private int startYear;
+    private int endYear;
+    private int runtimeMinutes;
+    //private List<String> genres;
+    private String genres;
 }

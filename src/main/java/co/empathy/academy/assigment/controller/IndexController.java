@@ -6,6 +6,7 @@ import co.empathy.academy.assigment.service.ElasticService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 public class IndexController {
@@ -61,6 +62,18 @@ public class IndexController {
     public ResponseEntity indexDocument(@PathVariable String indexName, @PathVariable String movieId,
                                                       @RequestBody Movie movie) {
         SimpleResponse sr = elastic.indexDocument(indexName, movieId, movie);
+        return ResponseEntity.status(sr.getStatusCode()).body(sr.getBodyMessage());
+    }
+
+    @GetMapping("{indexName}/_search")
+    public ResponseEntity searchIndex(@PathVariable String indexName, @RequestBody String body){
+        SimpleResponse sr = elastic.searchIndex(indexName, body);
+        return ResponseEntity.status(sr.getStatusCode()).body(sr.getBodyMessage());
+    }
+
+    @PostMapping("/index/imdb")
+    public ResponseEntity indexIMDB(@RequestParam("file") MultipartFile multipartFile ){
+        SimpleResponse sr = elastic.bulkIndex(multipartFile);
         return ResponseEntity.status(sr.getStatusCode()).body(sr.getBodyMessage());
     }
 }
