@@ -17,4 +17,5 @@ public class SearchController {
     public SearchResponse searchQuery(@RequestParam(value="query") String query) throws IOException {
         return searchService.searchQuery(query);
     }
+
 }
