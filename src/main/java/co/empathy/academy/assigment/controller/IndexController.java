@@ -2,7 +2,7 @@ package co.empathy.academy.assigment.controller;
 
 import co.empathy.academy.assigment.model.Movie;
 import co.empathy.academy.assigment.model.SimpleResponse;
-import co.empathy.academy.assigment.service.ElasticService;
+import co.empathy.academy.assigment.services.ElasticService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -62,12 +62,6 @@ public class IndexController {
     public ResponseEntity indexDocument(@PathVariable String indexName, @PathVariable String movieId,
                                                       @RequestBody Movie movie) {
         SimpleResponse sr = elastic.indexDocument(indexName, movieId, movie);
-        return ResponseEntity.status(sr.getStatusCode()).body(sr.getBodyMessage());
-    }
-
-    @GetMapping("{indexName}/_search")
-    public ResponseEntity searchIndex(@PathVariable String indexName, @RequestBody String body){
-        SimpleResponse sr = elastic.searchIndex(indexName, body);
         return ResponseEntity.status(sr.getStatusCode()).body(sr.getBodyMessage());
     }
 

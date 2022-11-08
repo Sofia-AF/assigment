@@ -1,11 +1,11 @@
-package co.empathy.academy.assigment.elastic;
+package co.empathy.academy.assigment.elastic.index;
 
 import co.empathy.academy.assigment.model.Movie;
 import co.empathy.academy.assigment.model.SimpleResponse;
-import co.empathy.academy.assigment.service.ElasticEngine;
-import co.empathy.academy.assigment.service.ElasticEngineImpl;
-import co.empathy.academy.assigment.service.ElasticService;
-import co.empathy.academy.assigment.service.ElasticServiceImpl;
+import co.empathy.academy.assigment.services.ElasticEngine;
+import co.empathy.academy.assigment.services.ElasticEngineImpl;
+import co.empathy.academy.assigment.services.ElasticService;
+import co.empathy.academy.assigment.services.ElasticServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;

@@ -1,4 +1,4 @@
-package co.empathy.academy.assigment;
+package co.empathy.academy.assigment.elastic;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
