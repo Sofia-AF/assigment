@@ -4,12 +4,17 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.indices.CreateIndexRequest;
+import co.elastic.clients.elasticsearch.indices.DeleteIndexRequest;
+import co.elastic.clients.elasticsearch.indices.DeleteIndexResponse;
 import co.empathy.academy.assigment.model.Movie;
+import co.empathy.academy.assigment.model.Principal;
 import co.empathy.academy.assigment.model.SimpleResponse;
 import org.apache.http.util.EntityUtils;
 import org.elasticsearch.client.Request;
+import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
+import org.elasticsearch.common.settings.Settings;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
@@ -81,15 +86,16 @@ public class ElasticEngineImpl implements ElasticEngine {
         // First checks parameters
         if(indexName == null)
             return new SimpleResponse(BAD_REQUEST_CODE, "ERROR: missing required parameter <indexName>");
-        else if (body == null)
+        if (body == null) {
             return new SimpleResponse(BAD_REQUEST_CODE, "ERROR: missing JSON body in PUT request.");
+        }
+        // Creates index request with default settings
+        InputStream mappings = getClass().getClassLoader().getResourceAsStream("default-mappings.json");
 
-        // Opens input stream for the string body
-        InputStream inputBody = new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8));
-
+        // Opens input stream for the request body
+        //InputStream mappings = new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8));
         // Fills index request with the contents for the new indexName
-        CreateIndexRequest request = CreateIndexRequest.of(b -> b
-                .index(indexName).withJson(inputBody));
+        CreateIndexRequest request = CreateIndexRequest.of(b -> b.index(indexName).withJson(mappings));
 
         try {
             // Creates the index, and checks it's been created correctly
@@ -116,9 +122,8 @@ public class ElasticEngineImpl implements ElasticEngine {
         // First checks parameters
         if(indexName == null)
             return new SimpleResponse(BAD_REQUEST_CODE, "ERROR: missing required parameter <indexName>");
-        else if (movie == null)
+        if (movie == null)
             return new SimpleResponse(BAD_REQUEST_CODE, "ERROR: missing JSON body in request.");
-
         try {
             // Checks type of request
             if(docId == null)
@@ -137,27 +142,46 @@ public class ElasticEngineImpl implements ElasticEngine {
 
     }
 
-
     /**
      * Bulk index the parsed contents of a file to a new index
-     * @param multipartFile : file with contents to index
+     * @param basics : file with basic contents to index
+     * @param principals : file with principals contents to index
      * @return SimpleResponse
      */
     @Override
-    public SimpleResponse bulkIndex(MultipartFile multipartFile){
-        if(multipartFile.isEmpty())
+    public SimpleResponse bulkIndex(MultipartFile basics, MultipartFile principals){
+        if(basics.isEmpty())
             return new SimpleResponse(SUCCESS_CODE, "Nothing to index.");
         List<Movie> movies = new ArrayList<Movie>();
         InputStream stream = null;
 
         try {
-            stream = multipartFile.getInputStream();
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
-            bufferedReader.readLine();
+            Response response = client.performRequest(new Request("HEAD", "/" + IMDB_INDEX));
+            if (response.getStatusLine().getStatusCode() == 200){
+                // If there's an index with that name, we delete it
+                elastic.indices().delete(d -> d.index(IMDB_INDEX));
+            }
+            // We create the IMDB index
+            createIndex(IMDB_INDEX, "");
+            indexAllDocsImdb(basics, principals);
+            return new SimpleResponse(SUCCESS_CODE, "All movies from '"+basics.getOriginalFilename()+
+                    "' were successfully indexed into '"+IMDB_INDEX+"' index.");
+        } catch (IOException e) {
+            return new SimpleResponse(BAD_REQUEST_CODE, "ERROR while indexing file '"+basics.getOriginalFilename()+"'");
+        }
+    }
+
+    public void indexAllDocsImdb(MultipartFile basicsFile, MultipartFile principalsFile){
+        List<Movie> movies = new ArrayList<Movie>();
+        try {
+            BufferedReader basics = new BufferedReader(new InputStreamReader(basicsFile.getInputStream(), StandardCharsets.UTF_8));
+            BufferedReader principals = new BufferedReader(new InputStreamReader(principalsFile.getInputStream(), StandardCharsets.UTF_8));
+            basics.readLine();
+            principals.readLine();
             int lineCounter = 0;
-            String newMovie;
-            while((newMovie = bufferedReader.readLine()) != null){
-                addMovie(newMovie, movies);
+            String currentMovie;
+            while((currentMovie = basics.readLine()) != null){
+                addMovie(currentMovie, principals, movies);
                 lineCounter++;
                 if(lineCounter == MAX_LINE_COUNTER){
                     indexNewBulk(movies);
@@ -165,10 +189,31 @@ public class ElasticEngineImpl implements ElasticEngine {
                     lineCounter = 0;
                 }
             }
-            return new SimpleResponse(SUCCESS_CODE, "All movies from '"+multipartFile.getOriginalFilename()+
-                    "' were successfully indexed into '"+IMDB_INDEX+"' index.");
+            if(lineCounter < MAX_LINE_COUNTER)
+                // Index the rest of the movies
+                indexNewBulk(movies);
+
         } catch (IOException e) {
-            return new SimpleResponse(BAD_REQUEST_CODE, "ERROR while indexing file '"+multipartFile.getOriginalFilename()+"'");
+            throw new RuntimeException(e);
+        }
+    }
+    
+    public List<Principal> readPrincipals(String movieId, BufferedReader principalsLine){
+        List<Principal> list = new ArrayList<>();
+        try {
+            while(true){
+                principalsLine.mark(1000);
+                String[] token = principalsLine.readLine().split("\t");
+                if(token[0].equals(movieId))
+                    list.add(new Principal(token[2]));
+                else{
+                    principalsLine.reset();
+                    return list;
+                }
+
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -197,15 +242,15 @@ public class ElasticEngineImpl implements ElasticEngine {
      * @param line : current line from the file that we're reading
      * @param movies : current bulk list
      */
-    private void addMovie(String line, List<Movie> movies) {
+    private void addMovie(String line, BufferedReader principals, List<Movie> movies) {
         String[] token = line.split("\t");
-        Movie newMovie = new Movie(token[0], token[1], token[2], token[3],
+        Movie currentMovie = new Movie(token[0], token[1], token[2], token[3],
                 token[4].equals("0") ? true : false,
                 token[5].equals("\\N") ? 0 : Integer.parseInt(token[5]),
                 token[6].equals("\\N") ? 0 : Integer.parseInt(token[6]),
                 token[7].equals("\\N") ? 0 : Integer.parseInt(token[7]),
-                token[8]);
-        movies.add(newMovie);
+                token[8], readPrincipals(token[0], principals));
+        movies.add(currentMovie);
     }
 
 }

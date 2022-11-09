@@ -1,6 +1,7 @@
 package co.empathy.academy.assigment.elastic.index;
 
 import co.empathy.academy.assigment.model.Movie;
+import co.empathy.academy.assigment.model.Principal;
 import co.empathy.academy.assigment.model.SimpleResponse;
 import co.empathy.academy.assigment.services.ElasticEngine;
 import co.empathy.academy.assigment.services.ElasticEngineImpl;
@@ -10,6 +11,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.BDDMockito.given;
@@ -22,7 +26,8 @@ public class ElasticEngineTesting {
     private final int EXPECTED_SUCCESS_CODE = 200;
     private final int EXPECTED_ERROR_CODE = 400;
     private final String TEST_INDEX_NAME = "test_index";
-    private final Movie movie = new Movie("id1","Movie", "Cars", "Cars", false, 2006, 0, 120, "animation");
+    private final List<Principal> principals = new ArrayList<>();
+    private final Movie movie = new Movie("id1","Movie", "Cars", "Cars", false, 2006, 0, 120, "animation", principals);
 
 
     @Test

@@ -1,6 +1,7 @@
 package co.empathy.academy.assigment.elastic.search;
 
 import co.empathy.academy.assigment.model.Movie;
+import co.empathy.academy.assigment.model.Principal;
 import co.empathy.academy.assigment.model.SearchResponseCustom;
 import co.empathy.academy.assigment.services.SearchEngine;
 import co.empathy.academy.assigment.services.SearchService;
@@ -39,7 +40,8 @@ public class SearchServiceImplTest {
             "\t} \n" +
             "}";
 
-    private final Movie movie1 = new Movie("tt0000001", "short", "Carmencita", "Carmencita", true, 1894, 0, 1, "Documentary,Short");
+    List<Principal> principals = new ArrayList<>();
+    private final Movie movie1 = new Movie("tt0000001", "short", "Carmencita", "Carmencita", true, 1894, 0, 1, "Documentary,Short", principals);
     private final List<Movie> movies = new ArrayList<>(){{
         add(movie1);
     }};

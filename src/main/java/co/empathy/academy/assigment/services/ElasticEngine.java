@@ -43,5 +43,5 @@ public interface ElasticEngine {
      * @param multipartFile : file with contents to index
      * @return SimpleResponse
      */
-    SimpleResponse bulkIndex(MultipartFile multipartFile);
+    SimpleResponse bulkIndex(MultipartFile basics, MultipartFile principals);
 }

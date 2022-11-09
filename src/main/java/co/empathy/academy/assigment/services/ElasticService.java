@@ -37,5 +37,5 @@ public interface ElasticService {
      */
     SimpleResponse indexDocument(String indexName, String docId, Movie movie);
 
-    SimpleResponse bulkIndex(MultipartFile multipartFile);
+    SimpleResponse bulkIndex(MultipartFile basics, MultipartFile principals);
 }

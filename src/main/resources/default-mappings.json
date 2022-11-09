@@ -1,0 +1,43 @@
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0
+  },
+  "mappings": {
+    "properties": {
+      "tconst": {
+        "type": "keyword"
+      },
+      "titleType": {
+        "type": "keyword"
+      },
+      "primaryTitle": {
+        "type": "text",
+        "search_analyzer": "standard",
+        "analyzer": "standard"
+      },
+      "originalTitle": {
+        "type": "text",
+        "search_analyzer": "standard",
+        "analyzer": "standard"
+      },
+      "isAdult": {
+        "type": "boolean"
+      },
+      "startYear": {
+        "type": "integer"
+      },
+      "endYear": {
+        "type": "integer"
+      },
+      "runtimeMinutes": {
+        "type": "integer"
+      },
+      "genres": {
+        "type": "text",
+        "search_analyzer": "standard",
+        "analyzer": "standard"
+      }
+    }
+  }
+}

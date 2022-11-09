@@ -18,4 +18,5 @@ public class Movie {
     private int runtimeMinutes;
     //private List<String> genres;
     private String genres;
+    private List<Principal> principals;
 }

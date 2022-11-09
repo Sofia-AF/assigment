@@ -68,12 +68,13 @@ public class IndexController {
     /**
      * POST request that bulk indexes all contents of a given file
      * Form: POST /index/imdb {JSON body}
-     * @param multipartFile : file with contents to bulk index
+     * @param basicsFile : file with contents to bulk index
+     * @param principalsFile : file with contents to bulk index
      * @return ResponseEntity with right status and custom body
      */
     @PostMapping("/index/imdb")
-    public ResponseEntity indexIMDB(@RequestParam("file") MultipartFile multipartFile ){
-        SimpleResponse sr = elastic.bulkIndex(multipartFile);
+    public ResponseEntity indexIMDB(@RequestParam("basics") MultipartFile basicsFile, @RequestParam("principals") MultipartFile principalsFile){
+        SimpleResponse sr = elastic.bulkIndex(basicsFile, principalsFile);
         return ResponseEntity.status(sr.getStatusCode()).body(sr.getBodyMessage());
     }
 }
