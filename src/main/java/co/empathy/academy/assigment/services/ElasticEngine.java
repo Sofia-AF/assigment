@@ -40,8 +40,8 @@ public interface ElasticEngine {
 
     /**
      * Bulk index the parsed contents of a file to a new index
-     * @param multipartFile : file with contents to index
+     * @param basics : file with movie contents to index
      * @return SimpleResponse
      */
-    SimpleResponse bulkIndex(MultipartFile basics, MultipartFile principals);
+    SimpleResponse bulkIndex(MultipartFile basics, MultipartFile principals, MultipartFile akas, MultipartFile ratings);
 }

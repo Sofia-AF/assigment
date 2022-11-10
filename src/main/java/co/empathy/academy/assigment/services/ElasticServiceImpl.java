@@ -35,7 +35,8 @@ public class ElasticServiceImpl implements ElasticService{
     }
 
     @Override
-    public SimpleResponse bulkIndex(MultipartFile basics, MultipartFile principals) {
-       return elasticEngine.bulkIndex(basics, principals);
+    public SimpleResponse bulkIndex(MultipartFile basics, MultipartFile principals, MultipartFile akas,
+                                    MultipartFile ratings) {
+       return elasticEngine.bulkIndex(basics, principals, akas, ratings);
     }
 }

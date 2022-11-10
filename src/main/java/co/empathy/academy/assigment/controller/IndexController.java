@@ -73,8 +73,11 @@ public class IndexController {
      * @return ResponseEntity with right status and custom body
      */
     @PostMapping("/index/imdb")
-    public ResponseEntity indexIMDB(@RequestParam("basics") MultipartFile basicsFile, @RequestParam("principals") MultipartFile principalsFile){
-        SimpleResponse sr = elastic.bulkIndex(basicsFile, principalsFile);
+    public ResponseEntity indexIMDB(@RequestParam("basics") MultipartFile basicsFile,
+                                    @RequestParam("principals") MultipartFile principalsFile,
+                                    @RequestParam("akas") MultipartFile akasFile,
+                                    @RequestParam("ratings") MultipartFile ratingsFile){
+        SimpleResponse sr = elastic.bulkIndex(basicsFile, principalsFile, akasFile, ratingsFile);
         return ResponseEntity.status(sr.getStatusCode()).body(sr.getBodyMessage());
     }
 }
