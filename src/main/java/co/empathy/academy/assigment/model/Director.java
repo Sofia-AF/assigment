@@ -5,7 +5,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Principal {
+public class Director {
     private String nconst;
     //private int ordering;
     //private String category;

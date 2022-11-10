@@ -2,7 +2,7 @@ package co.empathy.academy.assigment.elastic.index;
 
 import co.empathy.academy.assigment.model.Aka;
 import co.empathy.academy.assigment.model.Movie;
-import co.empathy.academy.assigment.model.Principal;
+import co.empathy.academy.assigment.model.Director;
 import co.empathy.academy.assigment.model.SimpleResponse;
 import co.empathy.academy.assigment.services.ElasticEngine;
 import co.empathy.academy.assigment.services.ElasticEngineImpl;
@@ -29,15 +29,15 @@ public class BulkIndexTest {
     private final int EXPECTED_SUCCESS_CODE = 200;
     private final int EXPECTED_ERROR_CODE = 400;
     private final List<Aka> akas = new ArrayList<>();
-    private final List<Principal> principals = new ArrayList<>(){{
-        add(new Principal("p1"));
+    private final List<Director> directors = new ArrayList<>(){{
+        add(new Director("p1"));
     }};
     private final List<String> genres = new ArrayList<>(){{
         add("Animation");
     }};
-    private final Movie movie1 = new Movie("id1","Movie", "Cars", "Cars", false, 2006, 0, 120, genres, 7.0f, 100, akas, principals);
+    private final Movie movie1 = new Movie("id1","Movie", "Cars", "Cars", false, 2006, 0, 120, genres, 7.0f, 100, akas, directors);
     private final MultipartFile basic = new MockMultipartFile("validFile", "validFile", "text/plain", movie1.toString().getBytes());
-    private final MultipartFile principal = new MockMultipartFile("principal", "principal", "text/plain", principals.get(0).toString().getBytes());
+    private final MultipartFile principal = new MockMultipartFile("principal", "principal", "text/plain", directors.get(0).toString().getBytes());
     private final MultipartFile aka = new MockMultipartFile("aka", "aka", "text/plain", "Coches".getBytes());
 
     private final MultipartFile ratings = new MockMultipartFile("ratings", "ratings", "text/plain", "ratings".getBytes());

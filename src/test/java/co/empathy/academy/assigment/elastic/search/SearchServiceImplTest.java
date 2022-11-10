@@ -2,7 +2,7 @@ package co.empathy.academy.assigment.elastic.search;
 
 import co.empathy.academy.assigment.model.Aka;
 import co.empathy.academy.assigment.model.Movie;
-import co.empathy.academy.assigment.model.Principal;
+import co.empathy.academy.assigment.model.Director;
 import co.empathy.academy.assigment.model.SearchResponseCustom;
 import co.empathy.academy.assigment.services.SearchEngine;
 import co.empathy.academy.assigment.services.SearchService;
@@ -42,14 +42,14 @@ public class SearchServiceImplTest {
             "}";
 
     private final List<Aka> akas = new ArrayList<>();
-    private final List<Principal> principals = new ArrayList<>(){{
-        add(new Principal("p1"));
+    private final List<Director> directors = new ArrayList<>(){{
+        add(new Director("p1"));
     }};
     private final List<String> genres = new ArrayList<>(){{
         add("Documentaty");
         add("Short");
     }};
-    private final Movie movie1 = new Movie("tt0000001", "short", "Carmencita", "Carmencita", true, 1894, 0, 1, genres, 9.1f, 100, akas, principals);
+    private final Movie movie1 = new Movie("tt0000001", "short", "Carmencita", "Carmencita", true, 1894, 0, 1, genres, 9.1f, 100, akas, directors);
     private final List<Movie> movies = new ArrayList<>(){{
         add(movie1);
     }};

@@ -20,5 +20,5 @@ public class Movie {
     private float averageRating;
     private int numVotes;
     private List<Aka> akas;
-    private List<Principal> principals;
+    private List<Director> directors;
 }

@@ -2,7 +2,7 @@ package co.empathy.academy.assigment.elastic.index;
 
 import co.empathy.academy.assigment.model.Aka;
 import co.empathy.academy.assigment.model.Movie;
-import co.empathy.academy.assigment.model.Principal;
+import co.empathy.academy.assigment.model.Director;
 import co.empathy.academy.assigment.model.SimpleResponse;
 import co.empathy.academy.assigment.services.ElasticEngine;
 import co.empathy.academy.assigment.services.ElasticEngineImpl;
@@ -28,13 +28,13 @@ public class ElasticEngineTesting {
     private final int EXPECTED_ERROR_CODE = 400;
     private final String TEST_INDEX_NAME = "test_index";
     private final List<Aka> akas = new ArrayList<>();
-    private final List<Principal> principals = new ArrayList<>(){{
-        add(new Principal("p1"));
+    private final List<Director> directors = new ArrayList<>(){{
+        add(new Director("p1"));
     }};
     private final List<String> genres = new ArrayList<>(){{
         add("Animation");
     }};
-    private final Movie movie = new Movie("id1","Movie", "Cars", "Cars", false, 2006, 0, 120, genres, 7.1f, 100, akas, principals);
+    private final Movie movie = new Movie("id1","Movie", "Cars", "Cars", false, 2006, 0, 120, genres, 7.1f, 100, akas, directors);
 
 
     @Test
