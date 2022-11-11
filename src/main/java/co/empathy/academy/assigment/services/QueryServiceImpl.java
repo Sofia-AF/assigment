@@ -2,10 +2,7 @@ package co.empathy.academy.assigment.services;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.FieldValue;
-import co.elastic.clients.elasticsearch._types.query_dsl.MultiMatchQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.TermQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.TermsQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.TermsQueryField;
+import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.empathy.academy.assigment.model.Movie;
@@ -22,6 +19,8 @@ import java.util.stream.Collectors;
 public class QueryServiceImpl implements QueryService {
     @Autowired
     private ElasticsearchClient elastic;
+
+    private final String IMDB_INDEX = "imdb";
 
     /**
      * Returns a list of Movie that satisfy the query
@@ -70,7 +69,7 @@ public class QueryServiceImpl implements QueryService {
      * @return list with found movies
      */
     @Override
-    public List<Movie> makeTermQuery(String indexName, JSONObject typeJSON){
+    public List<Movie> makeTermQueryOld(String indexName, JSONObject typeJSON){
         String term = (String) typeJSON.keys().next();
         JSONObject terms = typeJSON.getJSONObject(term);
         String value = terms.getString("value");
@@ -113,4 +112,24 @@ public class QueryServiceImpl implements QueryService {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public Query makeTermQuery(String term, String value) {
+            return TermQuery.of(t -> t.field(term).value(value))._toQuery();
+    }
+
+    @Override
+    public List<Movie> makeAllQueries(List<Query> queries) throws IOException {
+        List<Movie> allFoundMovies = null;
+        for(Query query : queries)
+            allFoundMovies.addAll(getFoundMovies( elastic.search(s -> s.index(IMDB_INDEX).query(query)
+                    .size(10), Movie.class)));
+        return allFoundMovies;
+    }
+    @Override
+    public List<Movie> makeIntervalQuery(String field, double max, double min) {
+        return null;
+    }
+
+
 }

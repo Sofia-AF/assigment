@@ -20,11 +20,11 @@ class DemoSearchServiceImplTest {
     void givenQueryWithResults_whenSearch_thenReturnNonZeroNumFound() {
         String query = "query with results";
         SearchEngine searchEngine = mock(SearchEngine.class);
-        given(searchEngine.search(query)).willReturn(5);
+        given(searchEngine.simpleSearch(query)).willReturn(5);
 
         SearchService searchService = new SearchServiceImpl(searchEngine);
 
-        int numResults = searchService.search(query);
+        int numResults = searchService.simpleSearch(query);
 
         assertTrue(numResults > 0);
     }
@@ -33,11 +33,11 @@ class DemoSearchServiceImplTest {
     void givenQueryWithNoResults_whenSearch_thenReturnZeroNumFound() {
         String query = "query with no results";
         SearchEngine searchEngine = mock(SearchEngine.class);
-        given(searchEngine.search(query)).willReturn(0);
+        given(searchEngine.simpleSearch(query)).willReturn(0);
 
         SearchService searchService = new SearchServiceImpl(searchEngine);
 
-        int numResults = searchService.search(query);
+        int numResults = searchService.simpleSearch(query);
 
         assertEquals(0, numResults);
     }
@@ -46,11 +46,11 @@ class DemoSearchServiceImplTest {
     void givenNoQuery_whenSearch_thenPropagateError() {
         SearchEngine searchEngine = mock(SearchEngine.class);
         Throwable expectedException = new RuntimeException("Error while searching");
-        given(searchEngine.search(null)).willThrow(expectedException);
+        given(searchEngine.simpleSearch(null)).willThrow(expectedException);
 
         SearchService searchService = new SearchServiceImpl(searchEngine);
 
-        assertThrows(expectedException.getClass(), () -> searchService.search(null));
+        assertThrows(expectedException.getClass(), () -> searchService.simpleSearch(null));
     }
 
 }

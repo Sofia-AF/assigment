@@ -6,6 +6,7 @@ import co.empathy.academy.assigment.model.SearchResponseCustom;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 // This is the service class that will implement your search service logic
 // It has a SearchEngine as a dependency
@@ -19,8 +20,8 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public int search(String query) {
-        return searchEngine.search(query);
+    public int simpleSearch(String query) {
+        return searchEngine.simpleSearch(query);
     }
 
     @Override
@@ -31,6 +32,13 @@ public class SearchServiceImpl implements SearchService {
     @Override
     public List<Movie> searchIndex(String indexName, String body) {
         return searchEngine.searchIndex(indexName, body);
+    }
+
+    @Override
+    public List<Movie> search(Optional<String> genre, Optional<Integer> maxYear, Optional<Integer> minYear,
+                                 Optional<Integer> maxMinutes, Optional<Integer> minMinutes,
+                                 Optional<Double> maxScore, Optional<Double> minScore, Optional<String> type) {
+        return searchEngine.search(genre, maxYear, minYear, maxMinutes, minMinutes, maxScore, minScore, type);
     }
 
 

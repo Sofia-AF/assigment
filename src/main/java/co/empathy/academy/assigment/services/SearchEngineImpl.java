@@ -1,14 +1,17 @@
 package co.empathy.academy.assigment.services;
 
-import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.empathy.academy.assigment.model.Movie;
 import co.empathy.academy.assigment.model.SearchResponseCustom;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 public class SearchEngineImpl implements SearchEngine {
 
@@ -21,7 +24,7 @@ public class SearchEngineImpl implements SearchEngine {
     private QueryService queries;
 
     @Override
-    public int search(String query) {
+    public int simpleSearch(String query) {
         if (query == null) {
             throw new RuntimeException("Query is mandatory");
         }
@@ -57,10 +60,28 @@ public class SearchEngineImpl implements SearchEngine {
         if(queryType.equals("multi_match"))
             return queries.makeMultiMatchQuery(indexName, typeJSON);
         else if(queryType.equals("term"))
-            return queries.makeTermQuery(indexName, typeJSON);
+            return queries.makeTermQueryOld(indexName, typeJSON);
         else if(queryType.contains("terms"))
             return queries.makeTermsQuery(indexName, typeJSON);
         else
             throw new IllegalArgumentException("ERROR: query search not allowed");
+    }
+
+    @Override
+    public List<Movie> search(Optional<String> genre, Optional<Integer> maxYear, Optional<Integer> minYear,
+                                 Optional<Integer> maxMinutes, Optional<Integer> minMinutes,
+                                 Optional<Double> maxScore, Optional<Double> minScore, Optional<String> type) {
+
+        BoolQuery.Builder boolQuery = null;
+        List<Query> allFilters = new ArrayList<>();
+        if (genre.isPresent()) {
+            List<Query> queriesGenre = new ArrayList<>();
+            String[] genres = genre.get().split(",");
+            for(String currentGenre : genres)
+                queriesGenre.add(queries.makeTermQuery("genres", currentGenre));
+            allFilters.addAll(queriesGenre);
+        }
+
+        return null;
     }
 }
