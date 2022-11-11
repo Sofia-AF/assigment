@@ -5,7 +5,6 @@ import co.empathy.academy.assigment.model.SimpleResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 
 public interface ElasticEngine {
     /**
@@ -39,9 +38,12 @@ public interface ElasticEngine {
     SimpleResponse indexDocument(String indexName, String docId, Movie movie);
 
     /**
-     * Bulk index the parsed contents of a file to a new index
-     * @param basics : file with movie contents to index
-     * @return SimpleResponse
+     * Bulk index the contents of different files to a new index
+     * @param basics : file with basic info to bulk index
+     * @param crew : file with crew info to bulk index
+     * @param akas : file with akas info to bulk index
+     * @param ratings : file with ratings info to bulk index
+     * @return SimpleResponse with right status and custom body
      */
     SimpleResponse bulkIndex(MultipartFile basics, MultipartFile crew, MultipartFile akas, MultipartFile ratings);
 }

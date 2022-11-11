@@ -7,8 +7,4 @@ import lombok.*;
 @AllArgsConstructor
 public class Director {
     private String nconst;
-    //private int ordering;
-    //private String category;
-    //private String job;
-    //private String[] characters;
 }

@@ -68,8 +68,10 @@ public class IndexController {
     /**
      * POST request that bulk indexes all contents of a given file
      * Form: POST /index/imdb {JSON body}
-     * @param basicsFile : file with contents to bulk index
-     * @param crewFile : file with contents to bulk index
+     * @param basicsFile : file with basic info to bulk index
+     * @param crewFile : file with crew info to bulk index
+     * @param akasFile : file with akas info to bulk index
+     * @param ratingsFile : file with ratings info to bulk index
      * @return ResponseEntity with right status and custom body
      */
     @PostMapping("/index/imdb")

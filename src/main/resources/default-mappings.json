@@ -61,7 +61,7 @@
           }
         }
       },
-      "principals": {
+      "directors": {
         "type": "nested",
         "properties": {
           "nconst": {
