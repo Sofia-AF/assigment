@@ -16,6 +16,9 @@ public class Movie {
     private int startYear;
     private int endYear;
     private int runtimeMinutes;
-    //private List<String> genres;
-    private String genres;
+    private List<String> genres;
+    private float averageRating;
+    private int numVotes;
+    private List<Aka> akas;
+    private List<Director> directors;
 }

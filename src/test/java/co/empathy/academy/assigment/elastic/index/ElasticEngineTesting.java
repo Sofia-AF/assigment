@@ -1,15 +1,20 @@
-package co.empathy.academy.assigment.elastic;
+package co.empathy.academy.assigment.elastic.index;
 
+import co.empathy.academy.assigment.model.Aka;
 import co.empathy.academy.assigment.model.Movie;
+import co.empathy.academy.assigment.model.Director;
 import co.empathy.academy.assigment.model.SimpleResponse;
-import co.empathy.academy.assigment.service.ElasticEngine;
-import co.empathy.academy.assigment.service.ElasticEngineImpl;
-import co.empathy.academy.assigment.service.ElasticService;
-import co.empathy.academy.assigment.service.ElasticServiceImpl;
+import co.empathy.academy.assigment.services.ElasticEngine;
+import co.empathy.academy.assigment.services.ElasticEngineImpl;
+import co.empathy.academy.assigment.services.ElasticService;
+import co.empathy.academy.assigment.services.ElasticServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.BDDMockito.given;
@@ -22,7 +27,14 @@ public class ElasticEngineTesting {
     private final int EXPECTED_SUCCESS_CODE = 200;
     private final int EXPECTED_ERROR_CODE = 400;
     private final String TEST_INDEX_NAME = "test_index";
-    private final Movie movie = new Movie("id1","Movie", "Cars", "Cars", false, 2006, 0, 120, "animation");
+    private final List<Aka> akas = new ArrayList<>();
+    private final List<Director> directors = new ArrayList<>(){{
+        add(new Director("p1"));
+    }};
+    private final List<String> genres = new ArrayList<>(){{
+        add("Animation");
+    }};
+    private final Movie movie = new Movie("id1","Movie", "Cars", "Cars", false, 2006, 0, 120, genres, 7.1f, 100, akas, directors);
 
 
     @Test

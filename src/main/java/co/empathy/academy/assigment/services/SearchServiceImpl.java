@@ -1,8 +1,11 @@
-package co.empathy.academy.assigment.service;
+package co.empathy.academy.assigment.services;
 
-import co.empathy.academy.assigment.model.SearchResponse;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.empathy.academy.assigment.model.Movie;
+import co.empathy.academy.assigment.model.SearchResponseCustom;
 
 import java.io.IOException;
+import java.util.List;
 
 // This is the service class that will implement your search service logic
 // It has a SearchEngine as a dependency
@@ -21,8 +24,14 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public SearchResponse searchQuery(String query) throws IOException {
+    public SearchResponseCustom searchQuery(String query) throws IOException {
         return searchEngine.searchQuery(query);
     }
+
+    @Override
+    public List<Movie> searchIndex(String indexName, String body) {
+        return searchEngine.searchIndex(indexName, body);
+    }
+
 
 }

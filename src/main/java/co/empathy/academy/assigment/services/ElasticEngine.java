@@ -1,12 +1,13 @@
-package co.empathy.academy.assigment.service;
+package co.empathy.academy.assigment.services;
 
 import co.empathy.academy.assigment.model.Movie;
 import co.empathy.academy.assigment.model.SimpleResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
-public interface ElasticService {
+public interface ElasticEngine {
     /**
      * Returns the current ElasticSearch version as a String
      * @return : String with current ES version
@@ -29,7 +30,7 @@ public interface ElasticService {
     SimpleResponse createIndex(String indexName, String body);
 
     /**
-     * Indexes a new document in a index. If the target index does not exist, creates new one
+     * Indexes a new document in an index. If the target index does not exist, creates new one
      * @param indexName : index target to index the new document
      * @param docId : document identifier (optional)
      * @param movie : request body with info of the movie to index
@@ -37,7 +38,10 @@ public interface ElasticService {
      */
     SimpleResponse indexDocument(String indexName, String docId, Movie movie);
 
-    SimpleResponse searchIndex(String indexName, String body);
-
-    SimpleResponse bulkIndex(MultipartFile multipartFile);
+    /**
+     * Bulk index the parsed contents of a file to a new index
+     * @param basics : file with movie contents to index
+     * @return SimpleResponse
+     */
+    SimpleResponse bulkIndex(MultipartFile basics, MultipartFile crew, MultipartFile akas, MultipartFile ratings);
 }

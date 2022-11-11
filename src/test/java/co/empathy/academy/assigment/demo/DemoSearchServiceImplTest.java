@@ -1,4 +1,4 @@
-package co.empathy.academy.assigment.service;
+package co.empathy.academy.assigment.demo;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -6,6 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
+import co.empathy.academy.assigment.services.SearchEngine;
+import co.empathy.academy.assigment.services.SearchService;
+import co.empathy.academy.assigment.services.SearchServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;

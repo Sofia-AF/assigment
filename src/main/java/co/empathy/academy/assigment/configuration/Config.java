@@ -1,9 +1,9 @@
 package co.empathy.academy.assigment.configuration;
 
-import co.empathy.academy.assigment.service.SearchEngine;
-import co.empathy.academy.assigment.service.SearchEngineImpl;
-import co.empathy.academy.assigment.service.SearchService;
-import co.empathy.academy.assigment.service.SearchServiceImpl;
+import co.empathy.academy.assigment.services.SearchEngine;
+import co.empathy.academy.assigment.services.SearchEngineImpl;
+import co.empathy.academy.assigment.services.SearchService;
+import co.empathy.academy.assigment.services.SearchServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

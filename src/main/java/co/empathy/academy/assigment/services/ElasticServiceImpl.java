@@ -1,4 +1,4 @@
-package co.empathy.academy.assigment.service;
+package co.empathy.academy.assigment.services;
 
 import co.empathy.academy.assigment.model.Movie;
 import co.empathy.academy.assigment.model.SimpleResponse;
@@ -35,12 +35,8 @@ public class ElasticServiceImpl implements ElasticService{
     }
 
     @Override
-    public SimpleResponse searchIndex(String indexName, String body) {
-        return elasticEngine.searchIndex(indexName, body);
-    }
-
-    @Override
-    public SimpleResponse bulkIndex(MultipartFile multipartFile) {
-       return elasticEngine.bulkIndex(multipartFile);
+    public SimpleResponse bulkIndex(MultipartFile basics, MultipartFile principals, MultipartFile akas,
+                                    MultipartFile ratings) {
+       return elasticEngine.bulkIndex(basics, principals, akas, ratings);
     }
 }

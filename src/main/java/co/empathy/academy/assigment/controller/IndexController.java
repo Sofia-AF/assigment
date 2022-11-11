@@ -2,7 +2,7 @@ package co.empathy.academy.assigment.controller;
 
 import co.empathy.academy.assigment.model.Movie;
 import co.empathy.academy.assigment.model.SimpleResponse;
-import co.empathy.academy.assigment.service.ElasticService;
+import co.empathy.academy.assigment.services.ElasticService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -65,21 +65,19 @@ public class IndexController {
         return ResponseEntity.status(sr.getStatusCode()).body(sr.getBodyMessage());
     }
 
-    @GetMapping("{indexName}/_search")
-    public ResponseEntity searchIndex(@PathVariable String indexName, @RequestBody String body){
-        SimpleResponse sr = elastic.searchIndex(indexName, body);
-        return ResponseEntity.status(sr.getStatusCode()).body(sr.getBodyMessage());
-    }
-
     /**
      * POST request that bulk indexes all contents of a given file
      * Form: POST /index/imdb {JSON body}
-     * @param multipartFile : file with contents to bulk index
+     * @param basicsFile : file with contents to bulk index
+     * @param crewFile : file with contents to bulk index
      * @return ResponseEntity with right status and custom body
      */
     @PostMapping("/index/imdb")
-    public ResponseEntity indexIMDB(@RequestParam("file") MultipartFile multipartFile ){
-        SimpleResponse sr = elastic.bulkIndex(multipartFile);
+    public ResponseEntity indexIMDB(@RequestParam("basics") MultipartFile basicsFile,
+                                    @RequestParam("crew") MultipartFile crewFile,
+                                    @RequestParam("akas") MultipartFile akasFile,
+                                    @RequestParam("ratings") MultipartFile ratingsFile){
+        SimpleResponse sr = elastic.bulkIndex(basicsFile, crewFile, akasFile, ratingsFile);
         return ResponseEntity.status(sr.getStatusCode()).body(sr.getBodyMessage());
     }
 }
