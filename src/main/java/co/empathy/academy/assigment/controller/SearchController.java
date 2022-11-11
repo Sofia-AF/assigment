@@ -1,7 +1,5 @@
 package co.empathy.academy.assigment.controller;
 
-import co.elastic.clients.elasticsearch.core.SearchResponse;
-import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.empathy.academy.assigment.model.Movie;
 import co.empathy.academy.assigment.model.SearchResponseCustom;
 import co.empathy.academy.assigment.services.QueryService;
@@ -21,11 +19,23 @@ public class SearchController {
     @Autowired
     QueryService queryService;
 
+    /**
+     * Returns simple text with the query value and the elastic version
+     * @param query : simple query we're searching
+     * @return : SearchResponseCustom with the correct values
+     * @throws IOException
+     */
     @GetMapping("/search")
     public SearchResponseCustom searchQuery(@RequestParam(value="query") String query) throws IOException {
         return searchService.searchQuery(query);
     }
 
+    /**
+     * Searches query in given index
+     * @param indexName : name of the index we're searching
+     * @param body : body of the request with settings and mappings
+     * @return
+     */
     @GetMapping("{indexName}/_search")
     public ResponseEntity searchIndex(@PathVariable String indexName, @RequestBody String body) {
         List<Movie> sr = searchService.searchIndex(indexName, body);

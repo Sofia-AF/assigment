@@ -143,10 +143,12 @@ public class ElasticEngineImpl implements ElasticEngine {
     }
 
     /**
-     * Bulk index the parsed contents of a file to a new index
-     * @param basics : file with basic contents to index
-     * @param crew : file with crew contents to index
-     * @return SimpleResponse
+     * Function to check some files and perform the request to Elastic
+     * @param basics : file with basic info to bulk index
+     * @param crew : file with crew info to bulk index
+     * @param akas : file with akas info to bulk index
+     * @param ratings : file with ratings info to bulk index
+     * @return SimpleResponse with right status and custom body
      */
     @Override
     public SimpleResponse bulkIndex(MultipartFile basics, MultipartFile crew, MultipartFile akas,
@@ -157,6 +159,7 @@ public class ElasticEngineImpl implements ElasticEngine {
         InputStream stream = null;
 
         try {
+            // Check if there's already an index with name IMDB_INDEX
             Response response = client.performRequest(new Request("HEAD", "/" + IMDB_INDEX));
             if (response.getStatusLine().getStatusCode() == 200){
                 // If there's an index with that name, we delete it
@@ -174,6 +177,14 @@ public class ElasticEngineImpl implements ElasticEngine {
         }
     }
 
+    /**
+     * Auxiliar function to bulk index the contents of different files to a new index
+     * @param basicsFile : file with basic info to bulk index
+     * @param crewFile : file with crew info to bulk index
+     * @param akasFile : file with akas info to bulk index
+     * @param ratingsFile : file with ratings info to bulk index
+     * @return SimpleResponse with right status and custom body
+     */
     public void indexAllDocsImdb(MultipartFile basicsFile, MultipartFile crewFile, MultipartFile akasFile,
                                  MultipartFile ratingsFile){
         List<Movie> movies = new ArrayList<Movie>();
@@ -223,31 +234,6 @@ public class ElasticEngineImpl implements ElasticEngine {
      * @return : List of crew of that specific movie
      */
     public List<Director> readCrew(String movieId, BufferedReader crewLine){
-        /**
-        List<Director> list = new ArrayList<>();
-        int maxCount = 0; // counts max number of tries of readLine() to check for movieId
-        boolean found = false;  // checks if current movieId was found
-        try {
-            while(maxCount < TOP_MAX_COUNT){
-                // sets mark on current readLine, so when it founds the next id we don't skip it on the next loop
-                crewLine.mark(1000);
-                String[] token = crewLine.readLine().split("\t");
-                if(token[0].equals(movieId)){
-                    found = true;
-                    list.add(new Director(token[1]));
-                } else{
-                    maxCount++;
-                    crewLine.reset();
-                    if(found)
-                        // break while condition
-                        maxCount += TOP_MAX_COUNT;
-                }
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return list;
-         */
         String line;
         String[] token, stringDirectors;
         List<Director> directors = new ArrayList<>();
@@ -293,7 +279,7 @@ public class ElasticEngineImpl implements ElasticEngine {
                 if(token[0].equals(movieId)){
                     found = true;
                     list.add(new Aka(token[2], token[3], token[4],
-                            token[7].equals("1") ? true : false));
+                            token[7].equals("1")));
                 } else{
                     maxCount++;
                     akasLine.reset();
@@ -308,6 +294,13 @@ public class ElasticEngineImpl implements ElasticEngine {
         return list;
     }
 
+    /**
+     * Checks ratings and number of votes for movie with id = movieId, and returns a lists with ratings for that
+     * specific movie
+     * @param movieId : movie we want to check
+     * @param ratingsLine : BufferedReader for title.ratings file
+     * @return : List of ratings of that specific movie or null if it's a TV series (they have no ratings)
+     */
     public String[] readRatings(String movieId, BufferedReader ratingsLine){
         String line;
         String[] token;
@@ -354,28 +347,35 @@ public class ElasticEngineImpl implements ElasticEngine {
     }
 
     /**
-     * Parse a line with Movie.class parameters. Adds the created movie to the current bulk list
-     * @param line : current line from the file that we're reading
-     * @param movies : current bulk list
+     *
+     * @param line: current line from the file that we're reading
+     * @param akas : BufferedReader for file title.akas
+     * @param crew : BufferedReader for file title.crew
+     * @param ratingsLine : BufferedReader for file title.ratings
+     * @param movies: current bulk list
      */
     private void addMovie(String line, BufferedReader akas, BufferedReader crew,
                           BufferedReader ratingsLine, List<Movie> movies) {
+        // We split the current line, so we can insert the different params of a movie
         String[] token = line.split("\t");
         String movieId = token[0];
         String[] ratings = readRatings(movieId, ratingsLine);
-        float avg;
-        int votes;
+        float avg;  // average rating of a movie
+        int votes;  // number of votes to determine a movie's rating
+        // Check if it's a movie, if not, default values of avg and votes are 0
         if(ratings == null){
             avg = 0f; votes = 0;
         }else{
             avg = Float.parseFloat(ratings[1]);
             votes = Integer.parseInt(ratings[2]);
         }
+        // We add to our movie list bulk a new movie read in the current line
         Movie currentMovie = new Movie(movieId, token[1], token[2], token[3],
                 token[4].equals("0") ? true : false,
                 token[5].equals("\\N") ? 0 : Integer.parseInt(token[5]),
                 token[6].equals("\\N") ? 0 : Integer.parseInt(token[6]),
                 token[7].equals("\\N") ? 0 : Integer.parseInt(token[7]),
+                // Genres are typed as String[], so we split them as a list
                 Arrays.asList(token[8].split(",")),
                 avg, votes,
                 readAkas(movieId, akas),
