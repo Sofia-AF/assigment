@@ -1,9 +1,7 @@
 package co.empathy.academy.assigment.controller;
 
-import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.empathy.academy.assigment.model.Movie;
 import co.empathy.academy.assigment.model.SearchResponseCustom;
-import co.empathy.academy.assigment.services.QueryService;
 import co.empathy.academy.assigment.services.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -42,17 +40,29 @@ public class SearchController {
         return ResponseEntity.ok().body(sr);
     }
 
+    /**
+     * Custom search that filters with given parameters
+     * @param genre : genre(s) of the movie
+     * @param maxYear : upper range of the year interval
+     * @param minYear : lower range of the year interval
+     * @param maxMinutes : upper range of the runtimeMinutes interval
+     * @param minMinutes : lower range of the runtimeMinutes interval
+     * @param maxScore : upper range of the rate interval
+     * @param minScore : lower range of the rate interval
+     * @param type : if it's a movie, short or tv-series
+     * @return : List of movies that satisfy the custom search
+     */
     @GetMapping(value="/search", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity search(@RequestParam(value = "genre", required = false) Optional<String> genre,
-                                 @RequestParam(value = "maxYear", required = false) Optional<Integer> maxYear,
                                  @RequestParam(value = "minYear", required = false) Optional<Integer> minYear,
-                                 @RequestParam(value = "maxMinutes", required = false) Optional<Integer> maxMinutes,
+                                 @RequestParam(value = "maxYear", required = false) Optional<Integer> maxYear,
                                  @RequestParam(value = "minMinutes", required = false) Optional<Integer> minMinutes,
-                                 @RequestParam(value = "maxScore", required = false) Optional<Double> maxScore,
+                                 @RequestParam(value = "maxMinutes", required = false) Optional<Integer> maxMinutes,
                                  @RequestParam(value = "minScore", required = false) Optional<Double> minScore,
+                                 @RequestParam(value = "maxScore", required = false) Optional<Double> maxScore,
                                  @RequestParam(value = "type", required = false) Optional<String> type
     ) {
-        List<Movie> sr = searchService.search(genre, maxYear, minYear, maxMinutes, minMinutes, maxScore,minScore, type);
+        List<Movie> sr = searchService.search(genre, maxYear, minYear, maxMinutes, minMinutes, maxScore, minScore, type);
         return ResponseEntity.ok().body(sr);
     }
 

@@ -380,7 +380,10 @@ public class ElasticEngineImpl implements ElasticEngine {
                 avg, votes,
                 readAkas(movieId, akas),
                 readCrew(movieId, crew));
-        movies.add(currentMovie);
+
+        // We don't want to index adult movies
+        if(!currentMovie.getIsAdult())
+            movies.add(currentMovie);
     }
 
 }
