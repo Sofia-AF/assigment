@@ -241,6 +241,7 @@ public class ElasticEngineImpl implements ElasticEngine {
         String[] token, stringDirectors;
         List<Director> directors = new ArrayList<>();
         int maxCount = 0; // counts max number of tries to readLine to check movieId
+        int id = Integer.parseInt(movieId.split("tt")[1]);
         try {
             crewLine.mark(5000);
             while(maxCount < TOP_MAX_COUNT) {
@@ -248,7 +249,9 @@ public class ElasticEngineImpl implements ElasticEngine {
                     maxCount++;
                 }else{
                     token = line.split("\t");
-                    if (token[0].equals(movieId)){
+                    // There are id's with different number os 0's, so we need to check by its number
+                    int currentId = Integer.parseInt(token[0].split("tt")[1]);
+                    if(currentId == id){
                         stringDirectors = token[1].split(",");
                         for(String d : stringDirectors)
                             directors.add(new Director(d));
@@ -271,13 +274,14 @@ public class ElasticEngineImpl implements ElasticEngine {
      * @param akasLine : BufferedReader for title.akas file
      * @return List of akas of that specific movie
      */
-    /**
     public List<Aka> readAkas(String movieId, BufferedReader akasLine){
         List<Aka> list = new ArrayList<>();
+        int maxCount = 0;
         boolean found = false, finished = false;  // checks if current movieId was found
         int id = Integer.parseInt(movieId.split("tt")[1]);
         try {
             while(!finished){
+                maxCount++;
                 akasLine.mark(10000);
                 String[] token = akasLine.readLine().split("\t");
                 // There are id's with different number os 0's, so we need to check by its number
@@ -292,32 +296,8 @@ public class ElasticEngineImpl implements ElasticEngine {
                         // break while condition
                         finished = true;
                 }
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return list;
-    }
-     */
-    public List<Aka> readAkas(String movieId, BufferedReader akasLine){
-        List<Aka> list = new ArrayList<>();
-        int maxCount = 0; // counts max number of tries to readLine to check movieId
-        boolean found = false;  // checks if current movieId was found
-        try {
-            while(maxCount < TOP_MAX_COUNT){
-                akasLine.mark(2000);
-                String[] token = akasLine.readLine().split("\t");
-                if(token[0].equals(movieId)){
-                    found = true;
-                    list.add(new Aka(token[2], token[3], token[4],
-                            token[7].equals("1")));
-                } else{
-                    maxCount++;
-                    akasLine.reset();
-                    if(found)
-                        // break while condition
-                        break;
-                }
+                if(maxCount == TOP_MAX_COUNT)
+                    finished = true;
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -336,6 +316,7 @@ public class ElasticEngineImpl implements ElasticEngine {
         String line;
         String[] token;
         int maxCount = 0; // counts max number of tries to readLine to check movieId
+        int id = Integer.parseInt(movieId.split("tt")[1]);
         try {
             ratingsLine.mark(2000);
             while (maxCount < TOP_MAX_COUNT) {
@@ -343,7 +324,9 @@ public class ElasticEngineImpl implements ElasticEngine {
                     maxCount++;
                 } else {
                     token = line.split("\t");
-                    if (token[0].equals(movieId)) {
+                    // There are id's with different number os 0's, so we need to check by its number
+                    int currentId = Integer.parseInt(token[0].split("tt")[1]);
+                    if(currentId == id){
                         return token;
                     } else
                         maxCount++;
@@ -362,13 +345,14 @@ public class ElasticEngineImpl implements ElasticEngine {
      * @param starringLine : BufferedReader for title.principals file
      * @return : List of actors of that specific movie
      */
-    /**
     public List<Starring> readStarring(String movieId, BufferedReader starringLine){
         List<Starring> list = new ArrayList<>();
         boolean found = false, finished = false;
+        int maxCount = 0;
         int id = Integer.parseInt(movieId.split("tt")[1]);
         try{
             while(!finished){
+                maxCount++;
                 starringLine.mark(10000);
                 String[] token = starringLine.readLine().split("\t");
                 // There are id's with different number os 0's, so we need to check by its number
@@ -383,32 +367,8 @@ public class ElasticEngineImpl implements ElasticEngine {
                         // break while condition
                         finished = true;
                 }
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return list;
-    }
-     */
-    public List<Starring> readStarring(String movieId, BufferedReader starringLine){
-        List<Starring> list = new ArrayList<>();
-        int maxCount = 0;
-        boolean found = false;
-        try{
-            while(maxCount < TOP_MAX_COUNT){
-                starringLine.mark(1000);
-                String[] token = starringLine.readLine().split("\t");
-                if(token[0].equals(movieId)){
-                    found = true;
-                    if(token[3].equals("actor") || token[3].equals("actress"))
-                        list.add(new Starring(new Actor(token[2]), token[5]));
-                }else {
-                    maxCount++;
-                    starringLine.reset();
-                    if(found)
-                        // break while condition
-                        break;
-                }
+                if(maxCount == TOP_MAX_COUNT)
+                    finished = true;
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

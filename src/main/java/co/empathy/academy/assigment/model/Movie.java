@@ -21,5 +21,5 @@ public class Movie {
     private int numVotes;
     private List<Aka> akas;
     private List<Director> directors;
-    private List<Starring> principals;
+    private List<Starring> starring;
 }
