@@ -45,5 +45,6 @@ public interface ElasticEngine {
      * @param ratings : file with ratings info to bulk index
      * @return SimpleResponse with right status and custom body
      */
-    SimpleResponse bulkIndex(MultipartFile basics, MultipartFile crew, MultipartFile akas, MultipartFile ratings);
+    SimpleResponse bulkIndex(MultipartFile basics, MultipartFile crew, MultipartFile akas, MultipartFile ratings,
+                             MultipartFile starring);
 }

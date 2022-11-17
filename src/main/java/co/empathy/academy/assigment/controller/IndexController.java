@@ -72,14 +72,16 @@ public class IndexController {
      * @param crewFile : file with crew info to bulk index
      * @param akasFile : file with akas info to bulk index
      * @param ratingsFile : file with ratings info to bulk index
+     * @param starringFile : file with people info to bulk index
      * @return ResponseEntity with right status and custom body
      */
     @PostMapping("/index/imdb")
     public ResponseEntity indexIMDB(@RequestParam("basics") MultipartFile basicsFile,
                                     @RequestParam("crew") MultipartFile crewFile,
                                     @RequestParam("akas") MultipartFile akasFile,
-                                    @RequestParam("ratings") MultipartFile ratingsFile){
-        SimpleResponse sr = elastic.bulkIndex(basicsFile, crewFile, akasFile, ratingsFile);
+                                    @RequestParam("ratings") MultipartFile ratingsFile,
+                                    @RequestParam("starring") MultipartFile starringFile){
+        SimpleResponse sr = elastic.bulkIndex(basicsFile, crewFile, akasFile, ratingsFile, starringFile);
         return ResponseEntity.status(sr.getStatusCode()).body(sr.getBodyMessage());
     }
 }

@@ -102,6 +102,8 @@ public class SearchEngineImpl implements SearchEngine {
         else
             allQueries.add(queries.makeTermQueryMust("titleType", "movie"));
 
+        // It can't be an adult movie
+        allQueries.add(queries.makeTermQueryMust("isAdult", "false"));
 
         // Should have one of these genres (or must?)
         if(genre.isPresent()){

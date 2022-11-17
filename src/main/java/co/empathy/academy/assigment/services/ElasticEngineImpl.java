@@ -4,10 +4,7 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.indices.CreateIndexRequest;
-import co.empathy.academy.assigment.model.Aka;
-import co.empathy.academy.assigment.model.Movie;
-import co.empathy.academy.assigment.model.Director;
-import co.empathy.academy.assigment.model.SimpleResponse;
+import co.empathy.academy.assigment.model.*;
 import org.apache.http.util.EntityUtils;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
@@ -16,11 +13,13 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class ElasticEngineImpl implements ElasticEngine {
@@ -28,9 +27,9 @@ public class ElasticEngineImpl implements ElasticEngine {
     private final int BAD_REQUEST_CODE = 400;
     private final int CLIENT_ERROR_CODE = 403;
     private final int SERVER_ERROR_CODE = 500;
-    private final int MAX_LINE_COUNTER = 200000;
+    private final int MAX_LINE_COUNTER = 20000;
     private final String IMDB_INDEX = "imdb";
-    private final int TOP_MAX_COUNT = 50;
+    private final int TOP_MAX_COUNT = 100;
 
 
     @Autowired
@@ -152,7 +151,7 @@ public class ElasticEngineImpl implements ElasticEngine {
      */
     @Override
     public SimpleResponse bulkIndex(MultipartFile basics, MultipartFile crew, MultipartFile akas,
-                                    MultipartFile ratings){
+                                    MultipartFile ratings, MultipartFile starring){
         if(basics.isEmpty())
             return new SimpleResponse(SUCCESS_CODE, "Nothing to index.");
         List<Movie> movies = new ArrayList<Movie>();
@@ -169,7 +168,7 @@ public class ElasticEngineImpl implements ElasticEngine {
             createIndex(IMDB_INDEX, "");
 
             // Read all docs given, and indexing all the contents
-            indexAllDocsImdb(basics, crew, akas, ratings);
+            indexAllDocsImdb(basics, crew, akas, ratings, starring);
             return new SimpleResponse(SUCCESS_CODE, "All movies from '"+basics.getOriginalFilename()+
                     "' were successfully indexed into '"+IMDB_INDEX+"' index.");
         } catch (IOException e) {
@@ -183,10 +182,11 @@ public class ElasticEngineImpl implements ElasticEngine {
      * @param crewFile : file with crew info to bulk index
      * @param akasFile : file with akas info to bulk index
      * @param ratingsFile : file with ratings info to bulk index
+     * @param starringFile : file with ratings info to bulk index
      * @return SimpleResponse with right status and custom body
      */
     public void indexAllDocsImdb(MultipartFile basicsFile, MultipartFile crewFile, MultipartFile akasFile,
-                                 MultipartFile ratingsFile){
+                                 MultipartFile ratingsFile, MultipartFile starringFile){
         List<Movie> movies = new ArrayList<Movie>();
         try {
             // First we initialize our BufferReaders
@@ -194,17 +194,19 @@ public class ElasticEngineImpl implements ElasticEngine {
             BufferedReader crew = new BufferedReader(new InputStreamReader(crewFile.getInputStream(), StandardCharsets.UTF_8));
             BufferedReader akas = new BufferedReader(new InputStreamReader(akasFile.getInputStream(), StandardCharsets.UTF_8));
             BufferedReader ratings = new BufferedReader(new InputStreamReader(ratingsFile.getInputStream(), StandardCharsets.UTF_8));
+            BufferedReader starring = new BufferedReader(new InputStreamReader(starringFile.getInputStream(), StandardCharsets.UTF_8));
 
             // And skip the first lines with the headers
             basics.readLine();
             crew.readLine();
             akas.readLine();
             ratings.readLine();
+            starring.readLine();
 
             int lineCounter = 0;
             String currentMovie;
             while((currentMovie = basics.readLine()) != null){
-                addMovie(currentMovie, akas, crew, ratings, movies);
+                addMovie(currentMovie, akas, crew, ratings, starring, movies);
                 lineCounter++;
                 // Index bulks of MAX_LINE_COUNTER movies
                 if(lineCounter == MAX_LINE_COUNTER){
@@ -221,6 +223,7 @@ public class ElasticEngineImpl implements ElasticEngine {
             crew.close();
             akas.close();
             ratings.close();
+            starring.close();
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -239,7 +242,7 @@ public class ElasticEngineImpl implements ElasticEngine {
         List<Director> directors = new ArrayList<>();
         int maxCount = 0; // counts max number of tries to readLine to check movieId
         try {
-            crewLine.mark(2000);
+            crewLine.mark(5000);
             while(maxCount < TOP_MAX_COUNT) {
                 if((line = crewLine.readLine()) == null){
                     maxCount++;
@@ -268,13 +271,41 @@ public class ElasticEngineImpl implements ElasticEngine {
      * @param akasLine : BufferedReader for title.akas file
      * @return List of akas of that specific movie
      */
+    /**
+    public List<Aka> readAkas(String movieId, BufferedReader akasLine){
+        List<Aka> list = new ArrayList<>();
+        boolean found = false, finished = false;  // checks if current movieId was found
+        int id = Integer.parseInt(movieId.split("tt")[1]);
+        try {
+            while(!finished){
+                akasLine.mark(10000);
+                String[] token = akasLine.readLine().split("\t");
+                // There are id's with different number os 0's, so we need to check by its number
+                int currentId = Integer.parseInt(token[0].split("tt")[1]);
+                if(currentId == id){
+                    found = true;
+                    list.add(new Aka(token[2], token[3], token[4],
+                            token[7].equals("1")));
+                } else{
+                    akasLine.reset();
+                    if(found)
+                        // break while condition
+                        finished = true;
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return list;
+    }
+     */
     public List<Aka> readAkas(String movieId, BufferedReader akasLine){
         List<Aka> list = new ArrayList<>();
         int maxCount = 0; // counts max number of tries to readLine to check movieId
         boolean found = false;  // checks if current movieId was found
         try {
             while(maxCount < TOP_MAX_COUNT){
-                akasLine.mark(1000);
+                akasLine.mark(2000);
                 String[] token = akasLine.readLine().split("\t");
                 if(token[0].equals(movieId)){
                     found = true;
@@ -285,7 +316,7 @@ public class ElasticEngineImpl implements ElasticEngine {
                     akasLine.reset();
                     if(found)
                         // break while condition
-                        maxCount += TOP_MAX_COUNT;
+                        break;
                 }
             }
         } catch (IOException e) {
@@ -301,21 +332,20 @@ public class ElasticEngineImpl implements ElasticEngine {
      * @param ratingsLine : BufferedReader for title.ratings file
      * @return : List of ratings of that specific movie or null if it's a TV series (they have no ratings)
      */
-    public String[] readRatings(String movieId, BufferedReader ratingsLine){
+    public String[] readRatings(String movieId, BufferedReader ratingsLine) {
         String line;
         String[] token;
         int maxCount = 0; // counts max number of tries to readLine to check movieId
         try {
-            ratingsLine.mark(1000);
-            while(maxCount < TOP_MAX_COUNT) {
-                if((line = ratingsLine.readLine()) == null){
+            ratingsLine.mark(2000);
+            while (maxCount < TOP_MAX_COUNT) {
+                if ((line = ratingsLine.readLine()) == null) {
                     maxCount++;
-                }else{
+                } else {
                     token = line.split("\t");
-                    if (token[0].equals(movieId)){
+                    if (token[0].equals(movieId)) {
                         return token;
-                    }
-                    else
+                    } else
                         maxCount++;
                 }
             }
@@ -324,6 +354,66 @@ public class ElasticEngineImpl implements ElasticEngine {
             throw new RuntimeException(e);
         }
         return null;
+    }
+
+    /**
+     * Checks actors for movie with id = movieId
+     * @param movieId : movie we want to check
+     * @param starringLine : BufferedReader for title.principals file
+     * @return : List of actors of that specific movie
+     */
+    /**
+    public List<Starring> readStarring(String movieId, BufferedReader starringLine){
+        List<Starring> list = new ArrayList<>();
+        boolean found = false, finished = false;
+        int id = Integer.parseInt(movieId.split("tt")[1]);
+        try{
+            while(!finished){
+                starringLine.mark(10000);
+                String[] token = starringLine.readLine().split("\t");
+                // There are id's with different number os 0's, so we need to check by its number
+                int currentId = Integer.parseInt(token[0].split("tt")[1]);
+                if(currentId == id){
+                    found = true;
+                    if(token[3].equals("actor") || token[3].equals("actress"))
+                        list.add(new Starring(new Actor(token[2]), token[5]));
+                }else {
+                    starringLine.reset();
+                    if(found)
+                        // break while condition
+                        finished = true;
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return list;
+    }
+     */
+    public List<Starring> readStarring(String movieId, BufferedReader starringLine){
+        List<Starring> list = new ArrayList<>();
+        int maxCount = 0;
+        boolean found = false;
+        try{
+            while(maxCount < TOP_MAX_COUNT){
+                starringLine.mark(1000);
+                String[] token = starringLine.readLine().split("\t");
+                if(token[0].equals(movieId)){
+                    found = true;
+                    if(token[3].equals("actor") || token[3].equals("actress"))
+                        list.add(new Starring(new Actor(token[2]), token[5]));
+                }else {
+                    maxCount++;
+                    starringLine.reset();
+                    if(found)
+                        // break while condition
+                        break;
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return list;
     }
 
     /**
@@ -352,16 +442,23 @@ public class ElasticEngineImpl implements ElasticEngine {
      * @param akas : BufferedReader for file title.akas
      * @param crew : BufferedReader for file title.crew
      * @param ratingsLine : BufferedReader for file title.ratings
+     * @param starring : BufferedReader for file title.principals
      * @param movies: current bulk list
      */
     private void addMovie(String line, BufferedReader akas, BufferedReader crew,
-                          BufferedReader ratingsLine, List<Movie> movies) {
+                          BufferedReader ratingsLine, BufferedReader starring,
+                          List<Movie> movies) {
+        float avg;  // average rating of a movie
+        int votes;  // number of votes to determine a movie's rating
+
         // We split the current line, so we can insert the different params of a movie
         String[] token = line.split("\t");
         String movieId = token[0];
+
+        // // We don't want to index adult movies
+        //        if(!token[4].equals("0")){
         String[] ratings = readRatings(movieId, ratingsLine);
-        float avg;  // average rating of a movie
-        int votes;  // number of votes to determine a movie's rating
+
         // Check if it's a movie, if not, default values of avg and votes are 0
         if(ratings == null){
             avg = 0f; votes = 0;
@@ -371,7 +468,7 @@ public class ElasticEngineImpl implements ElasticEngine {
         }
         // We add to our movie list bulk a new movie read in the current line
         Movie currentMovie = new Movie(movieId, token[1], token[2], token[3],
-                token[4].equals("0") ? true : false,
+                token[4].equals("0") ? false : true,
                 token[5].equals("\\N") ? 0 : Integer.parseInt(token[5]),
                 token[6].equals("\\N") ? 0 : Integer.parseInt(token[6]),
                 token[7].equals("\\N") ? 0 : Integer.parseInt(token[7]),
@@ -379,11 +476,10 @@ public class ElasticEngineImpl implements ElasticEngine {
                 Arrays.asList(token[8].split(",")),
                 avg, votes,
                 readAkas(movieId, akas),
-                readCrew(movieId, crew));
+                readCrew(movieId, crew),
+                readStarring(movieId, starring));
 
-        // We don't want to index adult movies
-        if(!currentMovie.getIsAdult())
-            movies.add(currentMovie);
+        movies.add(currentMovie);
     }
 
 }

@@ -1,9 +1,6 @@
 package co.empathy.academy.assigment.elastic.index;
 
-import co.empathy.academy.assigment.model.Aka;
-import co.empathy.academy.assigment.model.Movie;
-import co.empathy.academy.assigment.model.Director;
-import co.empathy.academy.assigment.model.SimpleResponse;
+import co.empathy.academy.assigment.model.*;
 import co.empathy.academy.assigment.services.ElasticEngine;
 import co.empathy.academy.assigment.services.ElasticEngineImpl;
 import co.empathy.academy.assigment.services.ElasticService;
@@ -34,7 +31,8 @@ public class ElasticEngineTesting {
     private final List<String> genres = new ArrayList<>(){{
         add("Animation");
     }};
-    private final Movie movie = new Movie("id1","Movie", "Cars", "Cars", false, 2006, 0, 120, genres, 7.1f, 100, akas, directors);
+    private final List<Starring> starring = new ArrayList<>();
+    private final Movie movie = new Movie("id1","Movie", "Cars", "Cars", false, 2006, 0, 120, genres, 7.1f, 100, akas, directors, starring);
 
 
     @Test

@@ -1,7 +1,22 @@
 {
   "settings": {
     "number_of_shards": 1,
-    "number_of_replicas": 0
+    "number_of_replicas": 0,
+    "analysis": {
+      "analyzer": {
+        "my_custom": {
+          "type": "custom",
+          "tokenizer": "standard",
+          "char_filter": [
+            "html_strip"
+          ],
+          "filter": [
+            "asciifolding",
+            "lowercase"
+          ]
+        }
+      }
+    }
   },
   "mappings": {
     "properties": {
@@ -13,13 +28,13 @@
       },
       "primaryTitle": {
         "type": "text",
-        "search_analyzer": "standard",
-        "analyzer": "standard"
+        "search_analyzer": "my_custom",
+        "analyzer": "my_custom"
       },
       "originalTitle": {
         "type": "text",
-        "search_analyzer": "standard",
-        "analyzer": "standard"
+        "search_analyzer": "my_custom",
+        "analyzer": "my_custom"
       },
       "isAdult": {
         "type": "boolean"
@@ -34,9 +49,7 @@
         "type": "integer"
       },
       "genres": {
-        "type": "text",
-        "search_analyzer": "standard",
-        "analyzer": "standard"
+        "type": "keyword"
       },
       "averageRating": {
         "type": "double"
@@ -48,13 +61,19 @@
         "type": "nested",
         "properties": {
           "title": {
-            "type": "text"
+            "type": "text",
+            "search_analyzer": "my_custom",
+            "analyzer": "my_custom"
           },
           "region": {
-            "type": "text"
+            "type": "text",
+            "search_analyzer": "my_custom",
+            "analyzer": "my_custom"
           },
           "language": {
-            "type": "text"
+            "type": "text",
+            "search_analyzer": "my_custom",
+            "analyzer": "my_custom"
           },
           "isOriginalTitle": {
             "type": "boolean"
@@ -65,7 +84,24 @@
         "type": "nested",
         "properties": {
           "nconst": {
-            "type": "text"
+            "type": "keyword"
+          }
+        }
+      },
+      "starring": {
+        "type": "nested",
+        "properties": {
+          "name": {
+            "properties": {
+              "nconst": {
+                "type": "keyword"
+              }
+            }
+          },
+          "characters": {
+            "type": "text",
+            "search_analyzer": "my_custom",
+            "analyzer": "my_custom"
           }
         }
       }

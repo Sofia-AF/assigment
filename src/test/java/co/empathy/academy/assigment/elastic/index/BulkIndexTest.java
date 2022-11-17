@@ -1,9 +1,6 @@
 package co.empathy.academy.assigment.elastic.index;
 
-import co.empathy.academy.assigment.model.Aka;
-import co.empathy.academy.assigment.model.Movie;
-import co.empathy.academy.assigment.model.Director;
-import co.empathy.academy.assigment.model.SimpleResponse;
+import co.empathy.academy.assigment.model.*;
 import co.empathy.academy.assigment.services.ElasticEngine;
 import co.empathy.academy.assigment.services.ElasticEngineImpl;
 import co.empathy.academy.assigment.services.ElasticService;
@@ -35,29 +32,31 @@ public class BulkIndexTest {
     private final List<String> genres = new ArrayList<>(){{
         add("Animation");
     }};
-    private final Movie movie1 = new Movie("id1","Movie", "Cars", "Cars", false, 2006, 0, 120, genres, 7.0f, 100, akas, directors);
+    private final List<Starring> starring = new ArrayList<>();
+    private final Movie movie1 = new Movie("id1","Movie", "Cars", "Cars", false, 2006, 0, 120, genres, 7.0f, 100, akas, directors, starring);
     private final MultipartFile basic = new MockMultipartFile("validFile", "validFile", "text/plain", movie1.toString().getBytes());
     private final MultipartFile principal = new MockMultipartFile("principal", "principal", "text/plain", directors.get(0).toString().getBytes());
     private final MultipartFile aka = new MockMultipartFile("aka", "aka", "text/plain", "Coches".getBytes());
 
     private final MultipartFile ratings = new MockMultipartFile("ratings", "ratings", "text/plain", "ratings".getBytes());
+    private final MultipartFile principals = new MockMultipartFile("principals", "principals", "text/plain", "principals".getBytes());
 
 
     @Test
     public void givenNoBasicFile_whenBulkIndexing_thenReturnError(){
         SimpleResponse expected = new SimpleResponse(EXPECTED_ERROR_CODE, "ERROR: file's not valid.");
-        given(ee.bulkIndex(null, principal, aka, ratings)).willReturn(expected);
+        given(ee.bulkIndex(null, principal, aka, ratings, principals)).willReturn(expected);
         ElasticService es = new ElasticServiceImpl(ee);
-        SimpleResponse given = es.bulkIndex(null, principal, aka, ratings);
+        SimpleResponse given = es.bulkIndex(null, principal, aka, ratings, principals);
         assertEquals(expected, given);
     }
 
     @Test
     public void givenNoPrincipalsFile_whenBulkIndexing_thenReturnError(){
         SimpleResponse expected = new SimpleResponse(EXPECTED_ERROR_CODE, "ERROR: file's not valid.");
-        given(ee.bulkIndex(basic, null, aka, ratings)).willReturn(expected);
+        given(ee.bulkIndex(basic, null, aka, ratings, principals)).willReturn(expected);
         ElasticService es = new ElasticServiceImpl(ee);
-        SimpleResponse given = es.bulkIndex(basic, null, aka, ratings);
+        SimpleResponse given = es.bulkIndex(basic, null, aka, ratings, principals);
         assertEquals(expected, given);
     }
 
@@ -65,9 +64,9 @@ public class BulkIndexTest {
     public void givenValidFile_whenBulkIndex_thenReturnOk(){
         SimpleResponse expected = new SimpleResponse(EXPECTED_SUCCESS_CODE, "All movies from '"+ basic.getOriginalFilename()+
                 "' were successfully indexed into 'imdb' index.");
-        given(ee.bulkIndex(basic, principal, aka, ratings)).willReturn(expected);
+        given(ee.bulkIndex(basic, principal, aka, ratings, principals)).willReturn(expected);
         ElasticService es = new ElasticServiceImpl(ee);
-        SimpleResponse given = es.bulkIndex(basic, principal, aka, ratings);
+        SimpleResponse given = es.bulkIndex(basic, principal, aka, ratings, principals);
         assertEquals(given, expected);
     }
 
